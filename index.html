@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thai Drama Series Explorer | Series Mapping</title>
+    <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;600&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff3366;
+            --secondary: #7000ff;
+            --accent: #00d2ff;
+            --bg: #0a0a0f;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text: #ffffff;
+            --text-dim: #b0b0b0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Anuphan', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(255, 51, 102, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(112, 0, 255, 0.15) 0%, transparent 40%);
+        }
+
+        header {
+            padding: 3rem 1rem;
+            text-align: center;
+            position: relative;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
+        }
+
+        p.subtitle {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem 5rem;
+        }
+
+        /* Search & Filters */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+            position: sticky;
+            top: 1rem;
+            z-index: 100;
+            background: rgba(10, 10, 15, 0.8);
+            padding: 1.5rem;
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .controls.scrolled {
+            padding: 1rem 1.5rem;
+            gap: 0;
+            opacity: 0.9;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .controls.scrolled:hover, .controls.scrolled:focus-within {
+            opacity: 1;
+            padding: 1.5rem;
+            gap: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .search-box {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            padding-left: 3rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(255, 51, 102, 0.3);
+        }
+
+        .search-box::before {
+            content: '🔍';
+            position: absolute;
+            left: 1.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.5;
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            justify-content: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: 200px;
+            opacity: 1;
+            overflow: hidden;
+        }
+
+        .controls.scrolled:not(:hover):not(:focus-within) .filters {
+            max-height: 0;
+            opacity: 0;
+            margin: 0;
+            padding: 0;
+            pointer-events: none;
+        }
+
+        .filter-pill {
+            padding: 0.5rem 1.2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 100px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            color: var(--text-dim);
+        }
+
+        .filter-pill:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .filter-pill.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            box-shadow: 0 0 15px rgba(255, 51, 102, 0.4);
+        }
+
+        /* Grid */
+        .series-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+            opacity: 0.7;
+        }
+
+        .card[data-cat="Family Drama"]::after { background: var(--secondary); }
+        .card[data-cat="Workplace Drama"]::after { background: var(--accent); }
+        .card[data-cat="Business & Customer Drama"]::after { background: #ffcc00; }
+        .card[data-cat="Everyday Life Drama"]::after { background: #00ff88; }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .series-id {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .source-tag {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.6rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            color: var(--text-dim);
+        }
+
+        .title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+            flex-grow: 1;
+        }
+
+        .category {
+            display: inline-block;
+            font-size: 0.75rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 100px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-dim);
+            border: 1px solid var(--glass-border);
+        }
+
+        /* Empty state */
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 5rem 0;
+            color: var(--text-dim);
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; }
+            .controls { 
+                padding: 1.5rem 1rem; 
+                position: relative;
+                top: 0;
+                margin-bottom: 1.5rem;
+            }
+        }
+
+        /* Stats */
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Thai Drama Series Explorer</h1>
+        <p class="subtitle">🗂️ Series Mapping Dashboard - คลังเนื้อเรื่อง Mini-Series 125 เรื่อง สำหรับ Content Creators</p>
+    </header>
+
+    <div class="container">
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="total-count">125</div>
+                <div class="stat-label">Total Stories</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">5</div>
+                <div class="stat-label">Categories</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">5</div>
+                <div class="stat-label">Source Files</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="ค้นหาชื่อเรื่อง หรือ Series ID...">
+            </div>
+            <div class="filters" id="category-filters">
+                <div class="filter-pill active" data-cat="all">All Stories</div>
+                <div class="filter-pill" data-cat="Romance">Romance</div>
+                <div class="filter-pill" data-cat="Family Drama">Family Drama</div>
+                <div class="filter-pill" data-cat="Workplace Drama">Workplace Drama</div>
+                <div class="filter-pill" data-cat="Business & Customer Drama">Business & Customer</div>
+                <div class="filter-pill" data-cat="Everyday Life Drama">Everyday Life</div>
+            </div>
+            <div class="filters" id="file-filters">
+                <div class="filter-pill active" data-file="all">All Files</div>
+                <div class="filter-pill" data-file="Generator 2">Gen 2</div>
+                <div class="filter-pill" data-file="Generator 3">Gen 3</div>
+                <div class="filter-pill" data-file="Generator 4">Gen 4</div>
+                <div class="filter-pill" data-file="Generator 5">Gen 5</div>
+                <div class="filter-pill" data-file="Generator 1">Gen 1</div>
+            </div>
+        </div>
+
+        <div class="series-grid" id="series-container">
+            <!-- Cards will be injected here -->
+            <div class="no-results" id="no-results">
+                <h3>ไม่พบผลการค้นหา</h3>
+                <p>ลองค้นหาด้วยคำอื่น หรือเปลี่ยนหมวดหมู่</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const seriesData = [
+            // Generator 2
+            { id: "Series1", title: "รักข้ามชนชั้นของเจ้าของโรงแรมกับพนักงานต้อนรับ", cat: "Romance", file: "Generator 2" },
+            { id: "Series2", title: "คู่กัดที่ต้องแกล้งเป็นคู่รัก", cat: "Romance", file: "Generator 2" },
+            { id: "Series3", title: "คนรักเก่าที่กลับมาพร้อมลูกน้อย", cat: "Romance", file: "Generator 2" },
+            { id: "Series4", title: "นักร้องดังตกหลุมรักครูดนตรี", cat: "Romance", file: "Generator 2" },
+            { id: "Series5", title: "หญิงสาวธรรมดาที่ช่วยทายาทตระกูลใหญ่", cat: "Romance", file: "Generator 2" },
+            { id: "Series6", title: "ยายที่ถูกลูกหลานทอดทิ้ง", cat: "Family Drama", file: "Generator 2" },
+            { id: "Series7", title: "พี่สาวเสียสละเพื่อให้น้องได้เรียน", cat: "Family Drama", file: "Generator 2" },
+            { id: "Series8", title: "ลูกชายที่เพิ่งรู้ว่าถูกเก็บมาเลี้ยง", cat: "Family Drama", file: "Generator 2" },
+            { id: "Series9", title: "ครอบครัวแตกแยกเพราะคำโกหก", cat: "Family Drama", file: "Generator 2" },
+            { id: "Series10", title: "มรดกลับที่เปลี่ยนชีวิตทุกคน", cat: "Family Drama", file: "Generator 2" },
+            { id: "Series11", title: "พนักงานบัญชีที่เปิดโปงการโกง", cat: "Workplace Drama", file: "Generator 2" },
+            { id: "Series12", title: "หัวหน้าสาวกับทีมที่ไม่ยอมรับ", cat: "Workplace Drama", file: "Generator 2" },
+            { id: "Series13", title: "โปรแกรมเมอร์อัจฉริยะที่ถูกขโมยผลงาน", cat: "Workplace Drama", file: "Generator 2" },
+            { id: "Series14", title: "ฝ่ายขายที่ถูกใส่ร้าย", cat: "Workplace Drama", file: "Generator 2" },
+            { id: "Series15", title: "เจ้าของบริษัทหญิงปลอมตัวเข้ามาตรวจงาน", cat: "Workplace Drama", file: "Generator 2" },
+            { id: "Series16", title: "ร้านข้าวแกงเล็กกับนักชิมชื่อดัง", cat: "Business & Customer Drama", file: "Generator 2" },
+            { id: "Series17", title: "ช่างซ่อมมือถือกับลูกค้าผู้ลึกลับ", cat: "Business & Customer Drama", file: "Generator 2" },
+            { id: "Series18", title: "ร้านดอกไม้กับลูกค้าประจำผู้ไม่เปิดเผยตัว", cat: "Business & Customer Drama", file: "Generator 2" },
+            { id: "Series19", title: "แม่ค้าออนไลน์ถูกรีวิวโจมตี", cat: "Business & Customer Drama", file: "Generator 2" },
+            { id: "Series20", title: "เจ้าของร้านเสื้อผ้ากับคู่แข่งในตลาด", cat: "Business & Customer Drama", file: "Generator 2" },
+            { id: "Series21", title: "วินมอเตอร์ไซค์กับผู้โดยสารที่เปลี่ยนชีวิตเขา", cat: "Everyday Life Drama", file: "Generator 2" },
+            { id: "Series22: ", title: "เจ้าหน้าที่รักษาความปลอดภัยผู้มีอดีต", cat: "Everyday Life Drama", file: "Generator 2" },
+            { id: "Series23", title: "คนเก็บขยะที่คืนเงินล้านให้เจ้าของ", cat: "Everyday Life Drama", file: "Generator 2" },
+            { id: "Series24", title: "ครูอนุบาลกับเด็กที่ไม่มีใครเข้าใจ", cat: "Everyday Life Drama", file: "Generator 2" },
+            { id: "Series25", title: "พนักงานร้านสะดวกซื้อกับลูกค้าประหลาด", cat: "Everyday Life Drama", file: "Generator 2" },
+
+            // Generator 3
+            { id: "Series1", title: "หมอสาวกับคนไข้ที่ปิดบังตัวตน", cat: "Romance", file: "Generator 3" },
+            { id: "Series2", title: "เจ้าสาวที่หนีงานแต่งมาพบรักแท้", cat: "Romance", file: "Generator 3" },
+            { id: "Series3", title: "ช่างภาพกับนางแบบผู้เย็นชา", cat: "Romance", file: "Generator 3" },
+            { id: "Series4", title: "เจ้าของฟาร์มกับนักธุรกิจสาวจากกรุงเทพฯ", cat: "Romance", file: "Generator 3" },
+            { id: "Series5", title: "รุ่นพี่มหาวิทยาลัยที่ไม่เคยลืมรักแรก", cat: "Romance", file: "Generator 3" },
+            { id: "Series6", title: "พ่อเลี้ยงเดี่ยวที่สู้เพื่อลูก", cat: "Family Drama", file: "Generator 3" },
+            { id: "Series7", title: "ลูกสาวที่กลับมาดูแลแม่ป่วย", cat: "Family Drama", file: "Generator 3" },
+            { id: "Series8", title: "พี่น้องที่คืนดีกันหลังงานศพ", cat: "Family Drama", file: "Generator 3" },
+            { id: "Series9", title: "เด็กกำพร้าที่รวมครอบครัวใหม่", cat: "Family Drama", file: "Generator 3" },
+            { id: "Series10", title: "ความลับในสมุดบันทึกของคุณตา", cat: "Family Drama", file: "Generator 3" },
+            { id: "Series11", title: "นักข่าวสาวที่เปิดโปงผู้บริหาร", cat: "Workplace Drama", file: "Generator 3" },
+            { id: "Series12", title: "เชฟมือหนึ่งที่ถูกลดตำแหน่ง", cat: "Workplace Drama", file: "Generator 3" },
+            { id: "Series13", title: "วิศวกรหนุ่มกับโครงการที่ถูกขัดขวาง", cat: "Workplace Drama", file: "Generator 3" },
+            { id: "Series14", title: "HR ที่ต้องเลือกระหว่างความถูกต้องกับหน้าที่", cat: "Workplace Drama", file: "Generator 3" },
+            { id: "Series15", title: "นักลงทุนที่ปลอมเป็นพนักงานฝึกหัด", cat: "Workplace Drama", file: "Generator 3" },
+            { id: "Series16", title: "ร้านก๋วยเตี๋ยวที่ถูกมหาเศรษฐีช่วยไว้", cat: "Business & Customer Drama", file: "Generator 3" },
+            { id: "Series17", title: "สปาเล็กๆ กับลูกค้าต่างชาติผู้มีอิทธิพล", cat: "Business & Customer Drama", file: "Generator 3" },
+            { id: "Series18", title: "คนส่งพัสดุกับลูกค้าสาวที่รอใครบางคน", cat: "Business & Customer Drama", file: "Generator 3" },
+            { id: "Series19", title: "เจ้าของเบเกอรี่ที่ถูกคัดลอกสูตร", cat: "Business & Customer Drama", file: "Generator 3" },
+            { id: "Series20", title: "ร้านหนังสือเก่ากับนักสะสมผู้ลึกลับ", cat: "Business & Customer Drama", file: "Generator 3" },
+            { id: "Series21", title: "คนสวนกับเจ้าของบ้านผู้โดดเดี่ยว", cat: "Everyday Life Drama", file: "Generator 3" },
+            { id: "Series22", title: "พนักงานรถไฟฟ้ากับเด็กที่หลงทาง", cat: "Everyday Life Drama", file: "Generator 3" },
+            { id: "Series23", title: "เจ้าของหอพักกับผู้เช่าปริศนา", cat: "Everyday Life Drama", file: "Generator 3" },
+            { id: "Series24", title: "ช่างตัดผมที่เปลี่ยนชีวิตลูกค้า", cat: "Everyday Life Drama", file: "Generator 3" },
+            { id: "Series25", title: "คนดูแลสัตว์กับหญิงสาวผู้หนีอดีต", cat: "Everyday Life Drama", file: "Generator 3" },
+
+            // Generator 4
+            { id: "Series1", title: "สถาปนิกหนุ่มกับเจ้าของบ้านสาว", cat: "Romance", file: "Generator 4" },
+            { id: "Series2", title: "นักเขียนนิยายกับแฟนคลับคนแรก", cat: "Romance", file: "Generator 4" },
+            { id: "Series3", title: "นักกฎหมายกับคู่ความที่กลายเป็นรัก", cat: "Romance", file: "Generator 4" },
+            { id: "Series4", title: "บาริสต้าหนุ่มกับลูกค้าประจำ", cat: "Romance", file: "Generator 4" },
+            { id: "Series5", title: "ผู้จัดการโรงแรมกับนักท่องเที่ยวสาว", cat: "Romance", file: "Generator 4" },
+            { id: "Series6", title: "คุณปู่ที่รอการกลับมาของหลาน", cat: "Family Drama", file: "Generator 4" },
+            { id: "Series7", title: "แม่ที่ยอมทำทุกอย่างเพื่อลูก", cat: "Family Drama", file: "Generator 4" },
+            { id: "Series8", title: "พี่ชายที่รับผิดแทนน้อง", cat: "Family Drama", file: "Generator 4" },
+            { id: "Series9", title: "ครอบครัวที่ต้องเริ่มต้นใหม่หลังไฟไหม้", cat: "Family Drama", file: "Generator 4" },
+            { id: "Series10", title: "จดหมายฉบับสุดท้ายของพ่อ", cat: "Family Drama", file: "Generator 4" },
+            { id: "Series11", title: "ดีไซเนอร์สาวที่ถูกหัวหน้ากดดัน", cat: "Workplace Drama", file: "Generator 4" },
+            { id: "Series12", title: "นักวิเคราะห์ข้อมูลผู้ค้นพบความผิดปกติ", cat: "Workplace Drama", file: "Generator 4" },
+            { id: "Series13", title: "ฝ่ายขายมือหนึ่งที่ถูกทรยศ", cat: "Workplace Drama", file: "Generator 4" },
+            { id: "Series14", title: "โปรดิวเซอร์รายการที่ต้องเลือกระหว่างชื่อเสียงกับความจริง", cat: "Workplace Drama", file: "Generator 4" },
+            { id: "Series15", title: "ผู้ถือหุ้นใหญ่ปลอมตัวเป็นแม่บ้าน", cat: "Workplace Drama", file: "Generator 4" },
+            { id: "Series16", title: "ร้านผลไม้ที่รอดจากรีวิวของเศรษฐี", cat: "Business & Customer Drama", file: "Generator 4" },
+            { id: "Series17", title: "ร้านทองกับลูกค้าผู้ตามหาของสำคัญ", cat: "Business & Customer Drama", file: "Generator 4" },
+            { id: "Series18", title: "อู่ซ่อมรถกับเจ้าของรถสาวผู้เข้มแข็ง", cat: "Business & Customer Drama", file: "Generator 4" },
+            { id: "Series19", title: "ร้านอาหารครอบครัวที่ถูกกดดันจากห้างใหญ่", cat: "Business & Customer Drama", file: "Generator 4" },
+            { id: "Series20", title: "ร้านเครื่องเขียนกับครูผู้เปลี่ยนชะตา", cat: "Business & Customer Drama", file: "Generator 4" },
+            { id: "Series21", title: "บุรุษไปรษณีย์กับจดหมายที่เปลี่ยนชีวิต", cat: "Everyday Life Drama", file: "Generator 4" },
+            { id: "Series22", title: "พนักงานธนาคารกับลูกค้าสูงวัย", cat: "Everyday Life Drama", file: "Generator 4" },
+            { id: "Series23", title: "อาสาสมัครกับเด็กเร่ร่อน", cat: "Everyday Life Drama", file: "Generator 4" },
+            { id: "Series24", title: "คนขายล็อตเตอรี่กับหญิงผู้สิ้นหวัง", cat: "Everyday Life Drama", file: "Generator 4" },
+            { id: "Series25", title: "เจ้าหน้าที่กู้ภัยกับเหตุการณ์ไม่คาดคิด", cat: "Everyday Life Drama", file: "Generator 4" },
+
+            // Generator 5
+            { id: "Series1", title: "นักดนตรีข้างถนนกับทายาทบริษัทใหญ่", cat: "Romance", file: "Generator 5" },
+            { id: "Series2", title: "ครูสอนภาษาไทยกับนักธุรกิจเกาหลี", cat: "Romance", file: "Generator 5" },
+            { id: "Series3", title: "นักกีฬาเก่ากับหมอผู้เยียวยาหัวใจ", cat: "Romance", file: "Generator 5" },
+            { id: "Series4", title: "เจ้าของแกลเลอรีกับศิลปินไร้ชื่อ", cat: "Romance", file: "Generator 5" },
+            { id: "Series5", title: "สาวออฟฟิศกับเพื่อนบ้านสุดเพอร์เฟกต์", cat: "Romance", file: "Generator 5" },
+            { id: "Series6", title: "หลานชายที่กลับบ้านหลังสิบปี", cat: "Family Drama", file: "Generator 5" },
+            { id: "Series7", title: "แม่บ้านที่กลายเป็นเสาหลักของครอบครัว", cat: "Family Drama", file: "Generator 5" },
+            { id: "Series8", title: "พี่น้องที่ตามหาพ่อแท้ๆ", cat: "Family Drama", file: "Generator 5" },
+            { id: "Series9", title: "ลูกคนเล็กที่พิสูจน์ตัวเอง", cat: "Family Drama", file: "Generator 5" },
+            { id: "Series10", title: "มรดกชิ้นเดียวที่รวมใจทุกคน", cat: "Family Drama", file: "Generator 5" },
+            { id: "Series11", title: "เจ้าหน้าที่ไอทีที่ช่วยบริษัทจากวิกฤต", cat: "Workplace Drama", file: "Generator 5" },
+            { id: "Series12", title: "พนักงานต้อนรับที่รู้ความลับของผู้บริหาร", cat: "Workplace Drama", file: "Generator 5" },
+            { id: "Series13", title: "นักการตลาดที่พลิกยอดขายด้วยไอเดียเดียว", cat: "Workplace Drama", file: "Generator 5" },
+            { id: "Series14", title: "ทนายหนุ่มที่ถูกบังคับให้ปกปิดความจริง", cat: "Workplace Drama", file: "Generator 5" },
+            { id: "Series15", title: "ประธานบริษัทปลอมตัวเป็นไรเดอร์", cat: "Workplace Drama", file: "Generator 5" },
+            { id: "Series16", title: "ร้านส้มตำเล็กๆ กับลูกค้าต่างชาติผู้ทรงอิทธิพล", cat: "Business & Customer Drama", file: "Generator 5" },
+            { id: "Series17", title: "ร้านเครื่องประดับทำมือกับเจ้าสาวผู้สิ้นหวัง", cat: "Business & Customer Drama", file: "Generator 5" },
+            { id: "Series18", title: "ร้านสัตว์เลี้ยงกับลูกค้าที่ตามหาสุนัขหาย", cat: "Business & Customer Drama", file: "Generator 5" },
+            { id: "Series19", title: "ผู้ขายของมือสองกับของล้ำค่าที่ไม่มีใครรู้", cat: "Business & Customer Drama", file: "Generator 5" },
+            { id: "Series20", title: "ร้านชานมกับคู่แข่งที่กลายเป็นหุ้นส่วน", cat: "Business & Customer Drama", file: "Generator 5" },
+            { id: "Series21", title: "คนขับรถตู้กับผู้โดยสารที่กำลังหนีปัญหา", cat: "Everyday Life Drama", file: "Generator 5" },
+            { id: "Series22", title: "เจ้าของร้านซักรีดกับความลับในกระเป๋าเสื้อ", cat: "Everyday Life Drama", file: "Generator 5" },
+            { id: "Series23", title: "ครูสอนว่ายน้ำกับเด็กที่กลัวน้ำ", cat: "Everyday Life Drama", file: "Generator 5" },
+            { id: "Series24", title: "เจ้าหน้าที่เทศบาลกับหญิงชราที่อยู่ลำพัง", cat: "Everyday Life Drama", file: "Generator 5" },
+            { id: "Series25", title: "พนักงานส่งอาหารกับคำสั่งซื้อสุดท้าย", cat: "Everyday Life Drama", file: "Generator 5" },
+
+            // Generator 1
+            { id: "Series1", title: "แฟนปลอมกลายเป็นรักจริง", cat: "Romance", file: "Generator 1" },
+            { id: "Series2", title: "แต่งงานหลอกเพื่อช่วยครอบครัว", cat: "Romance", file: "Generator 1" },
+            { id: "Series3", title: "รักแรกกลับมาในวันที่สายเกินไป", cat: "Romance", file: "Generator 1" },
+            { id: "Series4", title: "รักสามเส้าในหมู่เพื่อน", cat: "Romance", file: "Generator 1" },
+            { id: "Series5", title: "คนธรรมดาที่ซ่อนฐานะมหาเศรษฐี", cat: "Romance", file: "Generator 1" },
+            { id: "Series6", title: "ลูกสาวที่ถูกมองข้าม", cat: "Family Drama", file: "Generator 1" },
+            { id: "Series7", title: "พี่น้องแย่งมรดก", cat: "Family Drama", file: "Generator 1" },
+            { id: "Series8", title: "แม่เลี้ยงกับลูกติด", cat: "Family Drama", file: "Generator 1" },
+            { id: "Series9", title: "พ่อที่หายไปกลับมา", cat: "Family Drama", file: "Generator 1" },
+            { id: "Series10", title: "ความลับที่ซ่อนมา 20 ปี", cat: "Family Drama", file: "Generator 1" },
+            { id: "Series11", title: "เลขาที่ไม่มีใครเห็นค่า", cat: "Workplace Drama", file: "Generator 1" },
+            { id: "Series12", title: "เด็กฝึกงานพลิกบริษัท", cat: "Workplace Drama", file: "Generator 1" },
+            { id: "Series13", title: "เจ้านายเย็นชากับลูกน้องเก่ง", cat: "Workplace Drama", file: "Generator 1" },
+            { id: "Series14", title: "เพื่อนร่วมงานแทงข้างหลัง", cat: "Workplace Drama", file: "Generator 1" },
+            { id: "Series15", title: "CEO ปลอมตัวเป็นพนักงาน", cat: "Workplace Drama", file: "Generator 1" },
+            { id: "Series16", title: "แม่ค้าธรรมดากับลูกค้าผู้มีอิทธิพล", cat: "Business & Customer Drama", file: "Generator 1" },
+            { id: "Series17", title: "ร้านกาแฟเล็กกับนักลงทุนใหญ่", cat: "Business & Customer Drama", file: "Generator 1" },
+            { id: "Series18", title: "ลูกค้าประจำที่มีความลับ", cat: "Business & Customer Drama", file: "Generator 1" },
+            { id: "Series19", title: "อินฟลูเอนเซอร์ทำลายร้าน", cat: "Business & Customer Drama", file: "Generator 1" },
+            { id: "Series20", title: "เจ้าของร้านกับคู่แข่งหัวใจเดียวกัน", cat: "Business & Customer Drama", file: "Generator 1" },
+            { id: "Series21", title: "คนขับแท็กซี่ช่วยชีวิตเศรษฐี", cat: "Everyday Life Drama", file: "Generator 1" },
+            { id: "Series22", title: "เพื่อนบ้านที่ดูน่ารำคาญ", cat: "Everyday Life Drama", file: "Generator 1" },
+            { id: "Series23", title: "ครูพิเศษผู้เปลี่ยนชีวิตเด็ก", cat: "Everyday Life Drama", file: "Generator 1" },
+            { id: "Series24", title: "พยาบาลกับผู้ป่วยลึกลับ", cat: "Everyday Life Drama", file: "Generator 1" },
+            { id: "Series25", title: "เด็กส่งของกับหญิงสาวปริศนา", cat: "Everyday Life Drama", file: "Generator 1" }
+        ];
+
+        const container = document.getElementById('series-container');
+        const searchInput = document.getElementById('search-input');
+        const catFilters = document.querySelectorAll('#category-filters .filter-pill');
+        const fileFilters = document.querySelectorAll('#file-filters .filter-pill');
+        const noResults = document.getElementById('no-results');
+        const totalCountDisplay = document.getElementById('total-count');
+
+        let activeCat = 'all';
+        let activeFile = 'all';
+        let searchTerm = '';
+
+        function renderCards() {
+            const filtered = seriesData.filter(item => {
+                const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                    item.id.toLowerCase().includes(searchTerm.toLowerCase());
+                const matchesCat = activeCat === 'all' || item.cat === activeCat;
+                const matchesFile = activeFile === 'all' || item.file === activeFile;
+                return matchesSearch && matchesCat && matchesFile;
+            });
+
+            container.querySelectorAll('.card').forEach(el => el.remove());
+            
+            if (filtered.length === 0) {
+                noResults.style.display = 'block';
+            } else {
+                noResults.style.display = 'none';
+                filtered.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.setAttribute('data-cat', item.cat);
+                    card.innerHTML = `
+                        <div class="card-header">
+                            <span class="series-id">${item.id}</span>
+                            <span class="source-tag">${item.file}</span>
+                        </div>
+                        <div class="title">${item.title}</div>
+                        <div class="category">${item.cat}</div>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+            totalCountDisplay.textContent = filtered.length;
+        }
+
+        searchInput.addEventListener('input', (e) => {
+            searchTerm = e.target.value;
+            renderCards();
+        });
+
+        catFilters.forEach(pill => {
+            pill.addEventListener('click', () => {
+                catFilters.forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+                activeCat = pill.getAttribute('data-cat');
+                renderCards();
+            });
+        });
+
+        fileFilters.forEach(pill => {
+            pill.addEventListener('click', () => {
+                fileFilters.forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+                activeFile = pill.getAttribute('data-file');
+                renderCards();
+            });
+        });
+
+        // Scroll event for minimizing controls
+        const controlsElement = document.querySelector('.controls');
+        window.addEventListener('scroll', () => {
+            // ปิดการใช้งานย่อส่วนบนมือถือ เพราะทำให้การแสดงผลและการเลื่อนหน้าจอมีปัญหา
+            if (window.innerWidth <= 768) {
+                controlsElement.classList.remove('scrolled');
+                return;
+            }
+            
+            if (window.scrollY > 150) {
+                controlsElement.classList.add('scrolled');
+            } else {
+                controlsElement.classList.remove('scrolled');
+            }
+        });
+
+        // Initial render
+        renderCards();
+    </script>
+</body>
+</html>
