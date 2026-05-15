@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thai Drama Series Explorer | Series Mapping Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Anuphan:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Meta Design System: Inter · Meta Blue #0064E0 · binary surfaces · pill CTAs ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --meta-blue: #0064E0;
+      --meta-blue-hover: #0143B5;
+      --meta-blue-pressed: #004BB9;
+      --white: #FFFFFF;
+      --soft-gray: #F1F4F7;
+      --warm-gray: #F7F8FA;
+      --near-black: #1C1E21;
+      --charcoal: #1C2B33;
+      --slate: #5D6C7B;
+      --secondary: #65676B;
+      --divider: #DEE3E9;
+      --border: #CBD2D9;
+
+      /* Generator color palette */
+      --gen1: #E8516A;
+      --gen2: #0064E0;
+      --gen3: #7C3AED;
+      --gen4: #10B981;
+      --gen5: #F59E0B;
+      --gen6: #6366F1;
+      --gen7: #8B5CF6;
+      --gen8: #EC4899;
+      --gen9: #B45309;
+      --gen10: #DC2626;
+
+      /* Category colors */
+      --cat-romance: #E8516A;
+      --cat-family: #7C3AED;
+      --cat-work: #0064E0;
+      --cat-biz: #10B981;
+      --cat-life: #F59E0B;
+      --cat-mystery: #6366F1;
+      --cat-hist: #B45309;
+      --cat-crime: #DC2626;
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', 'Anuphan', Helvetica, Arial, sans-serif;
+      background: var(--soft-gray);
+      color: var(--charcoal);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Nav (frosted glass) ── */
+    nav {
+      position: sticky; top: 0; z-index: 200;
+      background: rgba(241,244,247,0.90);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+    .nav-inner {
+      max-width: 1440px; margin: 0 auto; padding: 0 40px;
+      height: 56px; display: flex; align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo { font-size: 16px; font-weight: 700; color: var(--charcoal); text-decoration: none; }
+    .nav-logo em { font-style: normal; color: var(--meta-blue); }
+    .nav-right { display: flex; align-items: center; gap: 12px; }
+    .nav-pill {
+      font-size: 12px; font-weight: 500; color: var(--slate);
+      background: var(--white); border: 1px solid var(--divider);
+      padding: 4px 12px; border-radius: 100px;
+    }
+
+    /* ── Hero (dark cinematic) ── */
+    .hero-dark {
+      background: var(--near-black);
+      padding: 80px 40px 64px;
+      text-align: center;
+    }
+    .hero-eyebrow {
+      display: inline-block; font-size: 13px; font-weight: 700;
+      color: #47A5FA; letter-spacing: 0.3px; margin-bottom: 16px;
+    }
+    .hero-heading {
+      font-size: clamp(34px, 5vw, 62px); font-weight: 500;
+      line-height: 1.14; color: var(--white);
+      max-width: 740px; margin: 0 auto 16px;
+      letter-spacing: -0.5px;
+    }
+    .hero-sub {
+      font-size: 17px; font-weight: 400; line-height: 1.5;
+      color: var(--slate); max-width: 520px; margin: 0 auto;
+    }
+
+    /* ── Stats strip (Meta Blue) ── */
+    .stats-blue { background: var(--meta-blue); padding: 40px; }
+    .stats-inner {
+      max-width: 1440px; margin: 0 auto;
+      display: flex; justify-content: center; gap: 80px; flex-wrap: wrap;
+    }
+    .stat-item { text-align: center; }
+    .stat-number { font-size: 36px; font-weight: 500; color: var(--white); line-height: 1.2; }
+    .stat-label { font-size: 13px; font-weight: 400; color: rgba(255,255,255,0.72); margin-top: 4px; }
+
+    /* ── Controls (sticky below nav) ── */
+    .controls-wrap {
+      position: sticky; top: 56px; z-index: 150;
+      background: rgba(241,244,247,0.96);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--divider);
+    }
+    .controls-inner {
+      max-width: 1440px; margin: 0 auto;
+      padding: 18px 40px;
+    }
+
+    .search-row { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; }
+    .search-wrap { position: relative; flex: 1; max-width: 440px; }
+    .search-icon {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      color: var(--slate); pointer-events: none;
+    }
+    .search-input {
+      font-family: inherit; font-size: 15px; color: var(--charcoal);
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 14px 10px 42px;
+      width: 100%; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .search-input::placeholder { color: rgba(93,108,123,0.7); }
+    .search-input:focus { border-color: var(--meta-blue); box-shadow: 0 0 0 3px rgba(0,100,224,0.18); }
+    .result-count { font-size: 13px; color: var(--slate); white-space: nowrap; }
+    .result-count strong { color: var(--charcoal); font-weight: 700; }
+
+    .filter-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+    .filter-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.6px; color: rgba(93,108,123,0.6);
+      min-width: 70px; flex-shrink: 0;
+    }
+    .filter-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .pill {
+      font-family: inherit; font-size: 13px; font-weight: 400;
+      padding: 6px 15px; border-radius: 100px;
+      border: 1px solid var(--divider);
+      background: var(--white); color: var(--slate);
+      cursor: pointer; user-select: none;
+      transition: border-color 0.18s, color 0.18s, background 0.18s, transform 0.12s;
+    }
+    .pill:hover { border-color: var(--meta-blue); color: var(--meta-blue); }
+    .pill.active { background: var(--meta-blue); color: var(--white); border-color: var(--meta-blue); }
+
+    /* Gen pills get their own color when active */
+    .pill[data-gen="1"].active  { background: var(--gen1);  border-color: var(--gen1); }
+    .pill[data-gen="2"].active  { background: var(--gen2);  border-color: var(--gen2); }
+    .pill[data-gen="3"].active  { background: var(--gen3);  border-color: var(--gen3); }
+    .pill[data-gen="4"].active  { background: var(--gen4);  border-color: var(--gen4); }
+    .pill[data-gen="5"].active  { background: var(--gen5);  border-color: var(--gen5); }
+    .pill[data-gen="6"].active  { background: var(--gen6);  border-color: var(--gen6); }
+    .pill[data-gen="7"].active  { background: var(--gen7);  border-color: var(--gen7); }
+    .pill[data-gen="8"].active  { background: var(--gen8);  border-color: var(--gen8); }
+    .pill[data-gen="9"].active  { background: var(--gen9);  border-color: var(--gen9); }
+    .pill[data-gen="10"].active { background: var(--gen10); border-color: var(--gen10); }
+
+    /* ── Main content ── */
+    .main-section { padding: 36px 0 80px; }
+    .container { max-width: 1440px; margin: 0 auto; padding: 0 40px; }
+
+    /* ── Series grid ── */
+    .series-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 20px 20px 18px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
+      display: flex; flex-direction: column;
+      position: relative; overflow: hidden;
+      border-left: 4px solid var(--meta-blue);
+      cursor: default;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.11), 0 2px 6px rgba(0,0,0,0.07);
+    }
+
+    /* Left-border color per generator */
+    .card[data-gen="1"]  { border-left-color: var(--gen1); }
+    .card[data-gen="2"]  { border-left-color: var(--gen2); }
+    .card[data-gen="3"]  { border-left-color: var(--gen3); }
+    .card[data-gen="4"]  { border-left-color: var(--gen4); }
+    .card[data-gen="5"]  { border-left-color: var(--gen5); }
+    .card[data-gen="6"]  { border-left-color: var(--gen6); }
+    .card[data-gen="7"]  { border-left-color: var(--gen7); }
+    .card[data-gen="8"]  { border-left-color: var(--gen8); }
+    .card[data-gen="9"]  { border-left-color: var(--gen9); }
+    .card[data-gen="10"] { border-left-color: var(--gen10); }
+
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .series-id { font-size: 11px; font-weight: 700; color: var(--slate); letter-spacing: 0.4px; text-transform: uppercase; }
+
+    .gen-tag {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.2px;
+      padding: 2px 8px; border-radius: 100px; color: var(--white);
+      background: var(--meta-blue);
+    }
+    .gen-tag[data-gen="1"]  { background: var(--gen1); }
+    .gen-tag[data-gen="2"]  { background: var(--gen2); }
+    .gen-tag[data-gen="3"]  { background: var(--gen3); }
+    .gen-tag[data-gen="4"]  { background: var(--gen4); }
+    .gen-tag[data-gen="5"]  { background: var(--gen5); }
+    .gen-tag[data-gen="6"]  { background: var(--gen6); }
+    .gen-tag[data-gen="7"]  { background: var(--gen7); }
+    .gen-tag[data-gen="8"]  { background: var(--gen8); }
+    .gen-tag[data-gen="9"]  { background: var(--gen9); }
+    .gen-tag[data-gen="10"] { background: var(--gen10); }
+
+    .card-title {
+      font-family: 'Anuphan', 'Inter', sans-serif;
+      font-size: 15px; font-weight: 500; color: var(--charcoal);
+      line-height: 1.5; flex-grow: 1; margin-bottom: 14px;
+    }
+
+    .cat-badge {
+      font-size: 11px; font-weight: 400; color: var(--slate);
+      background: var(--soft-gray); border: 1px solid var(--divider);
+      padding: 3px 10px; border-radius: 100px;
+      display: inline-block; align-self: flex-start;
+    }
+
+    /* ── Empty state ── */
+    .no-results {
+      grid-column: 1 / -1; text-align: center;
+      padding: 80px 0; color: var(--slate); display: none;
+    }
+    .no-results h3 { font-size: 20px; font-weight: 500; margin-bottom: 8px; color: var(--charcoal); }
+    .no-results p { font-size: 15px; }
+
+    /* ── Gen legend strip ── */
+    .gen-legend {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      padding: 20px 0 0;
+      max-width: 1440px; margin: 0 auto; padding: 20px 40px 0;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--slate); }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── Footer ── */
+    footer { background: var(--near-black); padding: 48px 0 32px; }
+    .footer-inner {
+      max-width: 1440px; margin: 0 auto; padding: 0 40px;
+      display: flex; justify-content: space-between; align-items: flex-start;
+      flex-wrap: wrap; gap: 24px;
+    }
+    .footer-brand { font-size: 16px; font-weight: 700; color: var(--white); margin-bottom: 6px; }
+    .footer-brand em { font-style: normal; color: #47A5FA; }
+    .footer-brand-desc { font-size: 13px; color: var(--secondary); line-height: 1.5; max-width: 260px; }
+    .footer-copy { font-size: 12px; color: var(--secondary); align-self: flex-end; }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .nav-inner, .controls-inner, .container, .gen-legend, .footer-inner { padding-left: 20px; padding-right: 20px; }
+      .hero-dark { padding: 56px 20px 48px; }
+      .stats-blue { padding: 28px 20px; }
+      .stats-inner { gap: 40px; }
+      .controls-wrap { top: 56px; }
+      .filter-row { flex-wrap: wrap; }
+      .filter-label { min-width: 100%; margin-bottom: 2px; }
+    }
+    @media (max-width: 600px) {
+      .nav-right { display: none; }
+      .search-row { flex-wrap: wrap; }
+      .result-count { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Nav ── -->
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="#">Thai Drama <em>Series Explorer</em></a>
+    <div class="nav-right">
+      <span class="nav-pill" id="nav-total">250 Series</span>
+      <span class="nav-pill">10 Generators</span>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Hero ── -->
+<section class="hero-dark">
+  <div class="hero-eyebrow">Series Mapping Dashboard — v3.0</div>
+  <h1 class="hero-heading">Thai Drama Series Explorer</h1>
+  <p class="hero-sub">คลังเนื้อเรื่อง Mini-Series 250 เรื่องจาก 10 Generator สำหรับ Content Creators</p>
+</section>
+
+<!-- ── Stats strip ── -->
+<div class="stats-blue">
+  <div class="stats-inner">
+    <div class="stat-item">
+      <div class="stat-number" id="stat-shown">250</div>
+      <div class="stat-label">Series ที่แสดง</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">8</div>
+      <div class="stat-label">Categories</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">10</div>
+      <div class="stat-label">Source Generators</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">250</div>
+      <div class="stat-label">Total Stories</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Controls ── -->
+<div class="controls-wrap">
+  <div class="controls-inner">
+    <div class="search-row">
+      <div class="search-wrap">
+        <svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input class="search-input" type="text" id="search-input" placeholder="ค้นหาชื่อเรื่อง หรือ Series ID..." autocomplete="off" />
+      </div>
+      <div class="result-count">แสดง <strong id="result-num">250</strong> จาก 250 เรื่อง</div>
+    </div>
+
+    <div class="filter-row">
+      <span class="filter-label">Category</span>
+      <div class="filter-pills" id="cat-filters">
+        <button class="pill active" data-cat="all">ทั้งหมด</button>
+        <button class="pill" data-cat="ความรัก">ความรัก</button>
+        <button class="pill" data-cat="ครอบครัว">ครอบครัว</button>
+        <button class="pill" data-cat="ที่ทำงาน">ที่ทำงาน</button>
+        <button class="pill" data-cat="ธุรกิจ & ลูกค้า">ธุรกิจ &amp; ลูกค้า</button>
+        <button class="pill" data-cat="ชีวิตประจำวัน">ชีวิตประจำวัน</button>
+        <button class="pill" data-cat="ลึกลับ & เหนือธรรมชาติ">ลึกลับ &amp; เหนือธรรมชาติ</button>
+        <button class="pill" data-cat="ย้อนยุค">ย้อนยุค</button>
+        <button class="pill" data-cat="อาชญากรรม & ระทึกขวัญ">อาชญากรรม &amp; ระทึกขวัญ</button>
+      </div>
+    </div>
+
+    <div class="filter-row">
+      <span class="filter-label">Generator</span>
+      <div class="filter-pills" id="gen-filters">
+        <button class="pill active" data-gen="all">Gen ทั้งหมด</button>
+        <button class="pill" data-gen="1">Gen 1</button>
+        <button class="pill" data-gen="2">Gen 2</button>
+        <button class="pill" data-gen="3">Gen 3</button>
+        <button class="pill" data-gen="4">Gen 4</button>
+        <button class="pill" data-gen="5">Gen 5</button>
+        <button class="pill" data-gen="6">Gen 6</button>
+        <button class="pill" data-gen="7">Gen 7</button>
+        <button class="pill" data-gen="8">Gen 8</button>
+        <button class="pill" data-gen="9">Gen 9</button>
+        <button class="pill" data-gen="10">Gen 10</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Main ── -->
+<section class="main-section">
+  <div class="container">
+
+    <!-- Generator color legend -->
+    <div class="gen-legend" style="padding-left:0; padding-right:0; margin-bottom:20px;">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--gen1)"></div> Gen 1 · ความรัก / โรแมนติก</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--gen2)"></div> Gen 2 · ดราม่าร่วมสมัย</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--gen3)"></div> Gen 3 · อารมณ์ลึก</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--gen4)"></div> Gen 4 · ที่ทำงาน &amp; ชีวิต</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--gen5)"></div> Gen 5 · เรื่องเมืองใหญ่</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--gen6)"></div> Gen 6 · ลึกลับ &amp; นิทานพื้นบ้าน</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--gen7)"></div> Gen 7 · วิญญาณ &amp; ของศักดิ์สิทธิ์</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--gen8)"></div> Gen 8 · ปาฏิหาริย์ &amp; กรรม</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--gen9)"></div> Gen 9 · ย้อนยุค / ประวัติศาสตร์</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--gen10)"></div> Gen 10 · อาชญากรรม &amp; ระทึกขวัญ</div>
+    </div>
+
+    <div class="series-grid" id="series-container">
+      <div class="no-results" id="no-results">
+        <h3>ไม่พบผลการค้นหา</h3>
+        <p>ลองค้นหาด้วยคำอื่น หรือเปลี่ยนหมวดหมู่ / Generator</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ── -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand">Thai Drama <em>Series Explorer</em></div>
+      <p class="footer-brand-desc">คลังเนื้อเรื่อง Mini-Series 250 เรื่อง ครอบคลุม 10 Generator สำหรับ Content Creators บน TikTok · YouTube Shorts · Facebook Reels</p>
+    </div>
+    <div class="footer-copy">Series Mapping Dashboard v3.0 · 10 Generators · 250 Stories</div>
+  </div>
+</footer>
+
+<script>
+const seriesData = [
+  // ═══════════════════════════════════════
+  // GENERATOR 1 — Romance-Driven Stories
+  // ═══════════════════════════════════════
+  { id:"G1·S1",  title:"แฟนปลอมกลายเป็นรักจริง",               cat:"ความรัก",                  gen:"1" },
+  { id:"G1·S2",  title:"แต่งงานหลอกเพื่อช่วยครอบครัว",         cat:"ความรัก",                  gen:"1" },
+  { id:"G1·S3",  title:"รักแรกกลับมาในวันที่สายเกินไป",         cat:"ความรัก",                  gen:"1" },
+  { id:"G1·S4",  title:"รักสามเส้าในหมู่เพื่อน",                cat:"ความรัก",                  gen:"1" },
+  { id:"G1·S5",  title:"คนธรรมดาที่ซ่อนฐานะมหาเศรษฐี",         cat:"ความรัก",                  gen:"1" },
+  { id:"G1·S6",  title:"ลูกสาวที่ถูกมองข้าม",                   cat:"ครอบครัว",             gen:"1" },
+  { id:"G1·S7",  title:"พี่น้องแย่งมรดก",                       cat:"ครอบครัว",             gen:"1" },
+  { id:"G1·S8",  title:"แม่เลี้ยงกับลูกติด",                    cat:"ครอบครัว",             gen:"1" },
+  { id:"G1·S9",  title:"พ่อที่หายไปกลับมา",                     cat:"ครอบครัว",             gen:"1" },
+  { id:"G1·S10", title:"ความลับที่ซ่อนมา 20 ปี",                cat:"ครอบครัว",             gen:"1" },
+  { id:"G1·S11", title:"เลขาที่ไม่มีใครเห็นค่า",                cat:"ที่ทำงาน",          gen:"1" },
+  { id:"G1·S12", title:"เด็กฝึกงานพลิกบริษัท",                  cat:"ที่ทำงาน",          gen:"1" },
+  { id:"G1·S13", title:"เจ้านายเย็นชากับลูกน้องเก่ง",           cat:"ที่ทำงาน",          gen:"1" },
+  { id:"G1·S14", title:"เพื่อนร่วมงานแทงข้างหลัง",              cat:"ที่ทำงาน",          gen:"1" },
+  { id:"G1·S15", title:"CEO ปลอมตัวเป็นพนักงาน",                cat:"ที่ทำงาน",          gen:"1" },
+  { id:"G1·S16", title:"แม่ค้าธรรมดากับลูกค้าผู้มีอิทธิพล",    cat:"ธุรกิจ & ลูกค้า",gen:"1" },
+  { id:"G1·S17", title:"ร้านกาแฟเล็กกับนักลงทุนใหญ่",           cat:"ธุรกิจ & ลูกค้า",gen:"1" },
+  { id:"G1·S18", title:"ลูกค้าประจำที่มีความลับ",               cat:"ธุรกิจ & ลูกค้า",gen:"1" },
+  { id:"G1·S19", title:"อินฟลูเอนเซอร์ทำลายร้าน",              cat:"ธุรกิจ & ลูกค้า",gen:"1" },
+  { id:"G1·S20", title:"เจ้าของร้านกับคู่แข่งหัวใจเดียวกัน",    cat:"ธุรกิจ & ลูกค้า",gen:"1" },
+  { id:"G1·S21", title:"คนขับแท็กซี่ช่วยชีวิตเศรษฐี",          cat:"ชีวิตประจำวัน",     gen:"1" },
+  { id:"G1·S22", title:"เพื่อนบ้านที่ดูน่ารำคาญ",               cat:"ชีวิตประจำวัน",     gen:"1" },
+  { id:"G1·S23", title:"ครูพิเศษผู้เปลี่ยนชีวิตเด็ก",           cat:"ชีวิตประจำวัน",     gen:"1" },
+  { id:"G1·S24", title:"พยาบาลกับผู้ป่วยลึกลับ",               cat:"ชีวิตประจำวัน",     gen:"1" },
+  { id:"G1·S25", title:"เด็กส่งของกับหญิงสาวปริศนา",            cat:"ชีวิตประจำวัน",     gen:"1" },
+
+  // ═══════════════════════════════════════
+  // GENERATOR 2 — Contemporary Drama
+  // ═══════════════════════════════════════
+  { id:"G2·S1",  title:"รักข้ามชนชั้นของเจ้าของโรงแรมกับพนักงานต้อนรับ", cat:"ความรัก",           gen:"2" },
+  { id:"G2·S2",  title:"คู่กัดที่ต้องแกล้งเป็นคู่รัก",                   cat:"ความรัก",           gen:"2" },
+  { id:"G2·S3",  title:"คนรักเก่าที่กลับมาพร้อมลูกน้อย",                 cat:"ความรัก",           gen:"2" },
+  { id:"G2·S4",  title:"นักร้องดังตกหลุมรักครูดนตรี",                    cat:"ความรัก",           gen:"2" },
+  { id:"G2·S5",  title:"หญิงสาวธรรมดาที่ช่วยทายาทตระกูลใหญ่",           cat:"ความรัก",           gen:"2" },
+  { id:"G2·S6",  title:"ยายที่ถูกลูกหลานทอดทิ้ง",                       cat:"ครอบครัว",      gen:"2" },
+  { id:"G2·S7",  title:"พี่สาวเสียสละเพื่อให้น้องได้เรียน",              cat:"ครอบครัว",      gen:"2" },
+  { id:"G2·S8",  title:"ลูกชายที่เพิ่งรู้ว่าถูกเก็บมาเลี้ยง",            cat:"ครอบครัว",      gen:"2" },
+  { id:"G2·S9",  title:"ครอบครัวแตกแยกเพราะคำโกหก",                     cat:"ครอบครัว",      gen:"2" },
+  { id:"G2·S10", title:"มรดกลับที่เปลี่ยนชีวิตทุกคน",                   cat:"ครอบครัว",      gen:"2" },
+  { id:"G2·S11", title:"พนักงานบัญชีที่เปิดโปงการโกง",                   cat:"ที่ทำงาน",   gen:"2" },
+  { id:"G2·S12", title:"หัวหน้าสาวกับทีมที่ไม่ยอมรับ",                  cat:"ที่ทำงาน",   gen:"2" },
+  { id:"G2·S13", title:"โปรแกรมเมอร์อัจฉริยะที่ถูกขโมยผลงาน",           cat:"ที่ทำงาน",   gen:"2" },
+  { id:"G2·S14", title:"ฝ่ายขายที่ถูกใส่ร้าย",                          cat:"ที่ทำงาน",   gen:"2" },
+  { id:"G2·S15", title:"เจ้าของบริษัทหญิงปลอมตัวเข้ามาตรวจงาน",        cat:"ที่ทำงาน",   gen:"2" },
+  { id:"G2·S16", title:"ร้านข้าวแกงเล็กกับนักชิมชื่อดัง",               cat:"ธุรกิจ & ลูกค้า", gen:"2" },
+  { id:"G2·S17", title:"ช่างซ่อมมือถือกับลูกค้าผู้ลึกลับ",              cat:"ธุรกิจ & ลูกค้า", gen:"2" },
+  { id:"G2·S18", title:"ร้านดอกไม้กับลูกค้าประจำผู้ไม่เปิดเผยตัว",      cat:"ธุรกิจ & ลูกค้า", gen:"2" },
+  { id:"G2·S19", title:"แม่ค้าออนไลน์ถูกรีวิวโจมตี",                    cat:"ธุรกิจ & ลูกค้า", gen:"2" },
+  { id:"G2·S20", title:"เจ้าของร้านเสื้อผ้ากับคู่แข่งในตลาด",           cat:"ธุรกิจ & ลูกค้า", gen:"2" },
+  { id:"G2·S21", title:"วินมอเตอร์ไซค์กับผู้โดยสารที่เปลี่ยนชีวิตเขา", cat:"ชีวิตประจำวัน",gen:"2" },
+  { id:"G2·S22", title:"เจ้าหน้าที่รักษาความปลอดภัยผู้มีอดีต",          cat:"ชีวิตประจำวัน",gen:"2" },
+  { id:"G2·S23", title:"คนเก็บขยะที่คืนเงินล้านให้เจ้าของ",             cat:"ชีวิตประจำวัน",gen:"2" },
+  { id:"G2·S24", title:"ครูอนุบาลกับเด็กที่ไม่มีใครเข้าใจ",             cat:"ชีวิตประจำวัน",gen:"2" },
+  { id:"G2·S25", title:"พนักงานร้านสะดวกซื้อกับลูกค้าประหลาด",          cat:"ชีวิตประจำวัน",gen:"2" },
+
+  // ═══════════════════════════════════════
+  // GENERATOR 3 — Emotional Arc
+  // ═══════════════════════════════════════
+  { id:"G3·S1",  title:"หมอสาวกับคนไข้ที่ปิดบังตัวตน",                  cat:"ความรัก",           gen:"3" },
+  { id:"G3·S2",  title:"เจ้าสาวที่หนีงานแต่งมาพบรักแท้",                cat:"ความรัก",           gen:"3" },
+  { id:"G3·S3",  title:"ช่างภาพกับนางแบบผู้เย็นชา",                     cat:"ความรัก",           gen:"3" },
+  { id:"G3·S4",  title:"เจ้าของฟาร์มกับนักธุรกิจสาวจากกรุงเทพฯ",        cat:"ความรัก",           gen:"3" },
+  { id:"G3·S5",  title:"รุ่นพี่มหาวิทยาลัยที่ไม่เคยลืมรักแรก",         cat:"ความรัก",           gen:"3" },
+  { id:"G3·S6",  title:"พ่อเลี้ยงเดี่ยวที่สู้เพื่อลูก",                 cat:"ครอบครัว",      gen:"3" },
+  { id:"G3·S7",  title:"ลูกสาวที่กลับมาดูแลแม่ป่วย",                    cat:"ครอบครัว",      gen:"3" },
+  { id:"G3·S8",  title:"พี่น้องที่คืนดีกันหลังงานศพ",                   cat:"ครอบครัว",      gen:"3" },
+  { id:"G3·S9",  title:"เด็กกำพร้าที่รวมครอบครัวใหม่",                  cat:"ครอบครัว",      gen:"3" },
+  { id:"G3·S10", title:"ความลับในสมุดบันทึกของคุณตา",                   cat:"ครอบครัว",      gen:"3" },
+  { id:"G3·S11", title:"นักข่าวสาวที่เปิดโปงผู้บริหาร",                 cat:"ที่ทำงาน",   gen:"3" },
+  { id:"G3·S12", title:"เชฟมือหนึ่งที่ถูกลดตำแหน่ง",                   cat:"ที่ทำงาน",   gen:"3" },
+  { id:"G3·S13", title:"วิศวกรหนุ่มกับโครงการที่ถูกขัดขวาง",            cat:"ที่ทำงาน",   gen:"3" },
+  { id:"G3·S14", title:"HR ที่ต้องเลือกระหว่างความถูกต้องกับหน้าที่",   cat:"ที่ทำงาน",   gen:"3" },
+  { id:"G3·S15", title:"นักลงทุนที่ปลอมเป็นพนักงานฝึกหัด",              cat:"ที่ทำงาน",   gen:"3" },
+  { id:"G3·S16", title:"ร้านก๋วยเตี๋ยวที่ถูกมหาเศรษฐีช่วยไว้",         cat:"ธุรกิจ & ลูกค้า", gen:"3" },
+  { id:"G3·S17", title:"สปาเล็กๆ กับลูกค้าต่างชาติผู้มีอิทธิพล",       cat:"ธุรกิจ & ลูกค้า", gen:"3" },
+  { id:"G3·S18", title:"คนส่งพัสดุกับลูกค้าสาวที่รอใครบางคน",           cat:"ธุรกิจ & ลูกค้า", gen:"3" },
+  { id:"G3·S19", title:"เจ้าของเบเกอรี่ที่ถูกคัดลอกสูตร",              cat:"ธุรกิจ & ลูกค้า", gen:"3" },
+  { id:"G3·S20", title:"ร้านหนังสือเก่ากับนักสะสมผู้ลึกลับ",            cat:"ธุรกิจ & ลูกค้า", gen:"3" },
+  { id:"G3·S21", title:"คนสวนกับเจ้าของบ้านผู้โดดเดี่ยว",              cat:"ชีวิตประจำวัน",gen:"3" },
+  { id:"G3·S22", title:"พนักงานรถไฟฟ้ากับเด็กที่หลงทาง",                cat:"ชีวิตประจำวัน",gen:"3" },
+  { id:"G3·S23", title:"เจ้าของหอพักกับผู้เช่าปริศนา",                  cat:"ชีวิตประจำวัน",gen:"3" },
+  { id:"G3·S24", title:"ช่างตัดผมที่เปลี่ยนชีวิตลูกค้า",               cat:"ชีวิตประจำวัน",gen:"3" },
+  { id:"G3·S25", title:"คนดูแลสัตว์กับหญิงสาวผู้หนีอดีต",              cat:"ชีวิตประจำวัน",gen:"3" },
+
+  // ═══════════════════════════════════════
+  // GENERATOR 4 — Workplace & Life
+  // ═══════════════════════════════════════
+  { id:"G4·S1",  title:"สถาปนิกหนุ่มกับเจ้าของบ้านสาว",                cat:"ความรัก",           gen:"4" },
+  { id:"G4·S2",  title:"นักเขียนนิยายกับแฟนคลับคนแรก",                 cat:"ความรัก",           gen:"4" },
+  { id:"G4·S3",  title:"นักกฎหมายกับคู่ความที่กลายเป็นรัก",            cat:"ความรัก",           gen:"4" },
+  { id:"G4·S4",  title:"บาริสต้าหนุ่มกับลูกค้าประจำ",                  cat:"ความรัก",           gen:"4" },
+  { id:"G4·S5",  title:"ผู้จัดการโรงแรมกับนักท่องเที่ยวสาว",           cat:"ความรัก",           gen:"4" },
+  { id:"G4·S6",  title:"คุณปู่ที่รอการกลับมาของหลาน",                  cat:"ครอบครัว",      gen:"4" },
+  { id:"G4·S7",  title:"แม่ที่ยอมทำทุกอย่างเพื่อลูก",                  cat:"ครอบครัว",      gen:"4" },
+  { id:"G4·S8",  title:"พี่ชายที่รับผิดแทนน้อง",                       cat:"ครอบครัว",      gen:"4" },
+  { id:"G4·S9",  title:"ครอบครัวที่ต้องเริ่มต้นใหม่หลังไฟไหม้",        cat:"ครอบครัว",      gen:"4" },
+  { id:"G4·S10", title:"จดหมายฉบับสุดท้ายของพ่อ",                      cat:"ครอบครัว",      gen:"4" },
+  { id:"G4·S11", title:"ดีไซเนอร์สาวที่ถูกหัวหน้ากดดัน",               cat:"ที่ทำงาน",   gen:"4" },
+  { id:"G4·S12", title:"นักวิเคราะห์ข้อมูลผู้ค้นพบความผิดปกติ",        cat:"ที่ทำงาน",   gen:"4" },
+  { id:"G4·S13", title:"ฝ่ายขายมือหนึ่งที่ถูกทรยศ",                    cat:"ที่ทำงาน",   gen:"4" },
+  { id:"G4·S14", title:"โปรดิวเซอร์รายการที่ต้องเลือกระหว่างชื่อเสียงกับความจริง", cat:"ที่ทำงาน", gen:"4" },
+  { id:"G4·S15", title:"ผู้ถือหุ้นใหญ่ปลอมตัวเป็นแม่บ้าน",            cat:"ที่ทำงาน",   gen:"4" },
+  { id:"G4·S16", title:"ร้านผลไม้ที่รอดจากรีวิวของเศรษฐี",             cat:"ธุรกิจ & ลูกค้า", gen:"4" },
+  { id:"G4·S17", title:"ร้านทองกับลูกค้าผู้ตามหาของสำคัญ",             cat:"ธุรกิจ & ลูกค้า", gen:"4" },
+  { id:"G4·S18", title:"อู่ซ่อมรถกับเจ้าของรถสาวผู้เข้มแข็ง",          cat:"ธุรกิจ & ลูกค้า", gen:"4" },
+  { id:"G4·S19", title:"ร้านอาหารครอบครัวที่ถูกกดดันจากห้างใหญ่",       cat:"ธุรกิจ & ลูกค้า", gen:"4" },
+  { id:"G4·S20", title:"ร้านเครื่องเขียนกับครูผู้เปลี่ยนชะตา",         cat:"ธุรกิจ & ลูกค้า", gen:"4" },
+  { id:"G4·S21", title:"บุรุษไปรษณีย์กับจดหมายที่เปลี่ยนชีวิต",        cat:"ชีวิตประจำวัน",gen:"4" },
+  { id:"G4·S22", title:"พนักงานธนาคารกับลูกค้าสูงวัย",                  cat:"ชีวิตประจำวัน",gen:"4" },
+  { id:"G4·S23", title:"อาสาสมัครกับเด็กเร่ร่อน",                      cat:"ชีวิตประจำวัน",gen:"4" },
+  { id:"G4·S24", title:"คนขายล็อตเตอรี่กับหญิงผู้สิ้นหวัง",            cat:"ชีวิตประจำวัน",gen:"4" },
+  { id:"G4·S25", title:"เจ้าหน้าที่กู้ภัยกับเหตุการณ์ไม่คาดคิด",       cat:"ชีวิตประจำวัน",gen:"4" },
+
+  // ═══════════════════════════════════════
+  // GENERATOR 5 — Urban Stories
+  // ═══════════════════════════════════════
+  { id:"G5·S1",  title:"นักดนตรีข้างถนนกับทายาทบริษัทใหญ่",            cat:"ความรัก",           gen:"5" },
+  { id:"G5·S2",  title:"ครูสอนภาษาไทยกับนักธุรกิจเกาหลี",              cat:"ความรัก",           gen:"5" },
+  { id:"G5·S3",  title:"นักกีฬาเก่ากับหมอผู้เยียวยาหัวใจ",             cat:"ความรัก",           gen:"5" },
+  { id:"G5·S4",  title:"เจ้าของแกลเลอรีกับศิลปินไร้ชื่อ",              cat:"ความรัก",           gen:"5" },
+  { id:"G5·S5",  title:"สาวออฟฟิศกับเพื่อนบ้านสุดเพอร์เฟกต์",          cat:"ความรัก",           gen:"5" },
+  { id:"G5·S6",  title:"หลานชายที่กลับบ้านหลังสิบปี",                  cat:"ครอบครัว",      gen:"5" },
+  { id:"G5·S7",  title:"แม่บ้านที่กลายเป็นเสาหลักของครอบครัว",         cat:"ครอบครัว",      gen:"5" },
+  { id:"G5·S8",  title:"พี่น้องที่ตามหาพ่อแท้ๆ",                       cat:"ครอบครัว",      gen:"5" },
+  { id:"G5·S9",  title:"ลูกคนเล็กที่พิสูจน์ตัวเอง",                    cat:"ครอบครัว",      gen:"5" },
+  { id:"G5·S10", title:"มรดกชิ้นเดียวที่รวมใจทุกคน",                   cat:"ครอบครัว",      gen:"5" },
+  { id:"G5·S11", title:"เจ้าหน้าที่ไอทีที่ช่วยบริษัทจากวิกฤต",         cat:"ที่ทำงาน",   gen:"5" },
+  { id:"G5·S12", title:"พนักงานต้อนรับที่รู้ความลับของผู้บริหาร",       cat:"ที่ทำงาน",   gen:"5" },
+  { id:"G5·S13", title:"นักการตลาดที่พลิกยอดขายด้วยไอเดียเดียว",       cat:"ที่ทำงาน",   gen:"5" },
+  { id:"G5·S14", title:"ทนายหนุ่มที่ถูกบังคับให้ปกปิดความจริง",        cat:"ที่ทำงาน",   gen:"5" },
+  { id:"G5·S15", title:"ประธานบริษัทปลอมตัวเป็นไรเดอร์",               cat:"ที่ทำงาน",   gen:"5" },
+  { id:"G5·S16", title:"ร้านส้มตำเล็กๆ กับลูกค้าต่างชาติผู้ทรงอิทธิพล", cat:"ธุรกิจ & ลูกค้า", gen:"5" },
+  { id:"G5·S17", title:"ร้านเครื่องประดับทำมือกับเจ้าสาวผู้สิ้นหวัง",  cat:"ธุรกิจ & ลูกค้า", gen:"5" },
+  { id:"G5·S18", title:"ร้านสัตว์เลี้ยงกับลูกค้าที่ตามหาสุนัขหาย",    cat:"ธุรกิจ & ลูกค้า", gen:"5" },
+  { id:"G5·S19", title:"ผู้ขายของมือสองกับของล้ำค่าที่ไม่มีใครรู้",    cat:"ธุรกิจ & ลูกค้า", gen:"5" },
+  { id:"G5·S20", title:"ร้านชานมกับคู่แข่งที่กลายเป็นหุ้นส่วน",        cat:"ธุรกิจ & ลูกค้า", gen:"5" },
+  { id:"G5·S21", title:"คนขับรถตู้กับผู้โดยสารที่กำลังหนีปัญหา",       cat:"ชีวิตประจำวัน",gen:"5" },
+  { id:"G5·S22", title:"เจ้าของร้านซักรีดกับความลับในกระเป๋าเสื้อ",     cat:"ชีวิตประจำวัน",gen:"5" },
+  { id:"G5·S23", title:"ครูสอนว่ายน้ำกับเด็กที่กลัวน้ำ",               cat:"ชีวิตประจำวัน",gen:"5" },
+  { id:"G5·S24", title:"เจ้าหน้าที่เทศบาลกับหญิงชราที่อยู่ลำพัง",      cat:"ชีวิตประจำวัน",gen:"5" },
+  { id:"G5·S25", title:"พนักงานส่งอาหารกับคำสั่งซื้อสุดท้าย",           cat:"ชีวิตประจำวัน",gen:"5" },
+
+  // ═══════════════════════════════════════
+  // GENERATOR 6 — Mystery, Folklore, Miracle, Curse & Superpowers
+  // ═══════════════════════════════════════
+  { id:"G6·S1",  title:"หญิงสาวผู้มองเห็นวิญญาณ",                      cat:"ลึกลับ & เหนือธรรมชาติ", gen:"6" },
+  { id:"G6·S2",  title:"บ้านร้างที่เรียกชื่อเจ้าของใหม่",              cat:"ลึกลับ & เหนือธรรมชาติ", gen:"6" },
+  { id:"G6·S3",  title:"เด็กชายผู้ย้อนเวลาได้ 8 วินาที",               cat:"ลึกลับ & เหนือธรรมชาติ", gen:"6" },
+  { id:"G6·S4",  title:"กระจกโบราณที่เผยความจริง",                     cat:"ลึกลับ & เหนือธรรมชาติ", gen:"6" },
+  { id:"G6·S5",  title:"หมอดูที่เห็นอนาคตของตัวเอง",                   cat:"ลึกลับ & เหนือธรรมชาติ", gen:"6" },
+  { id:"G6·S6",  title:"เสียงกระซิบจากต้นไทรร้อยปี",                   cat:"ลึกลับ & เหนือธรรมชาติ", gen:"6" },
+  { id:"G6·S7",  title:"สร้อยพระที่ปกป้องเจ้าของ",                     cat:"ลึกลับ & เหนือธรรมชาติ", gen:"6" },
+  { id:"G6·S8",  title:"หญิงสาวที่สัมผัสแล้วเห็นอดีต",                 cat:"ลึกลับ & เหนือธรรมชาติ", gen:"6" },
+  { id:"G6·S9",  title:"คำสาปจากเรือนไทยโบราณ",                       cat:"ลึกลับ & เหนือธรรมชาติ", gen:"6" },
+  { id:"G6·S10", title:"พยาบาลกับผู้ป่วยที่ไม่มีตัวตนในทะเบียน",       cat:"ลึกลับ & เหนือธรรมชาติ", gen:"6" },
+  { id:"G6·S11", title:"เด็กส่งของกับกล่องต้องห้าม",                   cat:"ลึกลับ & เหนือธรรมชาติ", gen:"6" },
+  { id:"G6·S12", title:"แม่ค้าธรรมดากับลูกค้าที่ไม่ใช่มนุษย์",         cat:"ลึกลับ & เหนือธรรมชาติ", gen:"6" },
+  { id:"G6·S13", title:"ชายหนุ่มผู้หยุดเวลาได้ชั่วคราว",               cat:"ลึกลับ & เหนือธรรมชาติ", gen:"6" },
+  { id:"G6·S14", title:"ภาพถ่ายที่เปลี่ยนชะตาชีวิต",                  cat:"ลึกลับ & เหนือธรรมชาติ", gen:"6" },
+  { id:"G6·S15", title:"CEO ที่มีพลังอ่านใจคน",                        cat:"ลึกลับ & เหนือธรรมชาติ", gen:"6" },
+  { id:"G6·S16", title:"ครูสาวกับนักเรียนผู้ทำนายอนาคต",               cat:"ลึกลับ & เหนือธรรมชาติ", gen:"6" },
+  { id:"G6·S17", title:"พระเครื่องที่เลือกเจ้าของเอง",                 cat:"ลึกลับ & เหนือธรรมชาติ", gen:"6" },
+  { id:"G6·S18", title:"หญิงปริศนาผู้ไม่แก่ไปตามกาลเวลา",             cat:"ลึกลับ & เหนือธรรมชาติ", gen:"6" },
+  { id:"G6·S19", title:"วิญญาณผู้ช่วยเปิดโปงความจริง",                 cat:"ลึกลับ & เหนือธรรมชาติ", gen:"6" },
+  { id:"G6·S20", title:"เด็กกำพร้ากับพลังรักษาผู้คน",                  cat:"ลึกลับ & เหนือธรรมชาติ", gen:"6" },
+  { id:"G6·S21", title:"ปาฏิหาริย์คืนสุดท้ายก่อนจากลา",               cat:"ลึกลับ & เหนือธรรมชาติ", gen:"6" },
+  { id:"G6·S22", title:"รถแท็กซี่ที่รับผู้โดยสารจากอีกภพ",             cat:"ลึกลับ & เหนือธรรมชาติ", gen:"6" },
+  { id:"G6·S23", title:"แหวนโบราณที่ผูกชะตารัก",                       cat:"ลึกลับ & เหนือธรรมชาติ", gen:"6" },
+  { id:"G6·S24", title:"คนธรรมดาที่คุยกับเทวดาได้",                    cat:"ลึกลับ & เหนือธรรมชาติ", gen:"6" },
+  { id:"G6·S25", title:"คำอธิษฐานที่เปลี่ยนชีวิตทั้งครอบครัว",         cat:"ลึกลับ & เหนือธรรมชาติ", gen:"6" },
+
+  // ═══════════════════════════════════════
+  // GENERATOR 7 — Spirits, Sacred Objects & Hidden Realms
+  // ═══════════════════════════════════════
+  { id:"G7·S1",  title:"เด็กหญิงผู้ได้ยินเสียงจากตุ๊กตาโบราณ",         cat:"ลึกลับ & เหนือธรรมชาติ", gen:"7" },
+  { id:"G7·S2",  title:"พระพุทธรูปองค์เล็กที่ทำให้คำอธิษฐานเป็นจริง", cat:"ลึกลับ & เหนือธรรมชาติ", gen:"7" },
+  { id:"G7·S3",  title:"หนุ่มนักดนตรีกับบทเพลงเรียกวิญญาณ",            cat:"ลึกลับ & เหนือธรรมชาติ", gen:"7" },
+  { id:"G7·S4",  title:"หญิงสาวที่หลุดเข้าไปในหมู่บ้านลับแล",          cat:"ลึกลับ & เหนือธรรมชาติ", gen:"7" },
+  { id:"G7·S5",  title:"สมุดบันทึกที่เขียนอนาคตได้",                   cat:"ลึกลับ & เหนือธรรมชาติ", gen:"7" },
+  { id:"G7·S6",  title:"สาวขายดอกไม้ผู้เห็นเทวดาประจำตัว",             cat:"ลึกลับ & เหนือธรรมชาติ", gen:"7" },
+  { id:"G7·S7",  title:"กำไลเงินที่ปกป้องจากอาถรรย์",                  cat:"ลึกลับ & เหนือธรรมชาติ", gen:"7" },
+  { id:"G7·S8",  title:"ชายหนุ่มที่มองเห็นเงากรรมของผู้คน",            cat:"ลึกลับ & เหนือธรรมชาติ", gen:"7" },
+  { id:"G7·S9",  title:"บ่อน้ำศักดิ์สิทธิ์กับความลับใต้ผืนดิน",       cat:"ลึกลับ & เหนือธรรมชาติ", gen:"7" },
+  { id:"G7·S10", title:"วิญญาณเด็กที่เฝ้ารอคำสัญญา",                   cat:"ลึกลับ & เหนือธรรมชาติ", gen:"7" },
+  { id:"G7·S11", title:"นักโบราณคดีกับประตูสู่อีกภพ",                  cat:"ลึกลับ & เหนือธรรมชาติ", gen:"7" },
+  { id:"G7·S12", title:"หญิงสาวผู้พูดคุยกับสัตว์ได้",                  cat:"ลึกลับ & เหนือธรรมชาติ", gen:"7" },
+  { id:"G7·S13", title:"แผนที่โบราณที่พาไปสู่เมืองต้องห้าม",           cat:"ลึกลับ & เหนือธรรมชาติ", gen:"7" },
+  { id:"G7·S14", title:"คนสวนกับต้นไม้ที่ตอบคำถามได้",                 cat:"ลึกลับ & เหนือธรรมชาติ", gen:"7" },
+  { id:"G7·S15", title:"แหวนหยกที่เผยชาติภพก่อน",                     cat:"ลึกลับ & เหนือธรรมชาติ", gen:"7" },
+  { id:"G7·S16", title:"หมอหนุ่มกับคนไข้ที่หายตัวทุกคืน",              cat:"ลึกลับ & เหนือธรรมชาติ", gen:"7" },
+  { id:"G7·S17", title:"ดวงตาที่มองเห็นภูตผี",                         cat:"ลึกลับ & เหนือธรรมชาติ", gen:"7" },
+  { id:"G7·S18", title:"ร้านของเก่าที่เปิดเฉพาะคืนเดือนเพ็ญ",          cat:"ลึกลับ & เหนือธรรมชาติ", gen:"7" },
+  { id:"G7·S19", title:"ชายผู้ได้รับพรให้รู้ความจริง",                 cat:"ลึกลับ & เหนือธรรมชาติ", gen:"7" },
+  { id:"G7·S20", title:"ผ้าคลุมโบราณที่ซ่อนพลังศักดิ์สิทธิ์",         cat:"ลึกลับ & เหนือธรรมชาติ", gen:"7" },
+  { id:"G7·S21", title:"เด็กกำพร้ากับผู้พิทักษ์จากอีกโลก",             cat:"ลึกลับ & เหนือธรรมชาติ", gen:"7" },
+  { id:"G7·S22", title:"นาฬิกาที่หยุดเมื่อความตายมาเยือน",             cat:"ลึกลับ & เหนือธรรมชาติ", gen:"7" },
+  { id:"G7·S23", title:"หญิงสาวกับคำสาปเจ็ดชั่วอายุคน",               cat:"ลึกลับ & เหนือธรรมชาติ", gen:"7" },
+  { id:"G7·S24", title:"ผู้เฒ่าผู้รักษาประตูวิญญาณ",                  cat:"ลึกลับ & เหนือธรรมชาติ", gen:"7" },
+  { id:"G7·S25", title:"ดาวตกคืนเดียวที่เปลี่ยนโชคชะตา",              cat:"ลึกลับ & เหนือธรรมชาติ", gen:"7" },
+
+  // ═══════════════════════════════════════
+  // GENERATOR 8 — Miracles, Karma & Extraordinary Gifts
+  // ═══════════════════════════════════════
+  { id:"G8·S1",  title:"แม่ค้าก๋วยเตี๋ยวผู้รักษาคนด้วยการสัมผัส",     cat:"ลึกลับ & เหนือธรรมชาติ", gen:"8" },
+  { id:"G8·S2",  title:"เด็กชายที่ฝันเห็นเหตุการณ์ล่วงหน้า",           cat:"ลึกลับ & เหนือธรรมชาติ", gen:"8" },
+  { id:"G8·S3",  title:"หญิงสาวผู้ลบความทรงจำเจ็บปวดได้",              cat:"ลึกลับ & เหนือธรรมชาติ", gen:"8" },
+  { id:"G8·S4",  title:"ชายหนุ่มที่รับโชคร้ายแทนคนรัก",                cat:"ลึกลับ & เหนือธรรมชาติ", gen:"8" },
+  { id:"G8·S5",  title:"คำอธิษฐานหน้าศาลเจ้าที่เป็นจริง",              cat:"ลึกลับ & เหนือธรรมชาติ", gen:"8" },
+  { id:"G8·S6",  title:"นักเรียนสาวที่คุยกับวิญญาณบรรพบุรุษ",           cat:"ลึกลับ & เหนือธรรมชาติ", gen:"8" },
+  { id:"G8·S7",  title:"เหรียญโบราณที่เรียกปาฏิหาริย์",                cat:"ลึกลับ & เหนือธรรมชาติ", gen:"8" },
+  { id:"G8·S8",  title:"คุณหมอผู้หยุดหัวใจคนตายได้ชั่วคราว",           cat:"ลึกลับ & เหนือธรรมชาติ", gen:"8" },
+  { id:"G8·S9",  title:"หนุ่มไรเดอร์กับพรสามข้อ",                      cat:"ลึกลับ & เหนือธรรมชาติ", gen:"8" },
+  { id:"G8·S10", title:"หญิงสาวที่เห็นเส้นด้ายแห่งโชคชะตา",            cat:"ลึกลับ & เหนือธรรมชาติ", gen:"8" },
+  { id:"G8·S11", title:"ครูผู้แบ่งปันความฝันให้ศิษย์",                  cat:"ลึกลับ & เหนือธรรมชาติ", gen:"8" },
+  { id:"G8·S12", title:"คนเก็บขยะกับสมบัติจากสวรรค์",                  cat:"ลึกลับ & เหนือธรรมชาติ", gen:"8" },
+  { id:"G8·S13", title:"เด็กหญิงที่เปลี่ยนน้ำตาเป็นอัญมณี",            cat:"ลึกลับ & เหนือธรรมชาติ", gen:"8" },
+  { id:"G8·S14", title:"ชายผู้ได้ยินเสียงกรรมของตนเอง",                cat:"ลึกลับ & เหนือธรรมชาติ", gen:"8" },
+  { id:"G8·S15", title:"เทียนศักดิ์สิทธิ์ที่เปิดเผยความจริง",          cat:"ลึกลับ & เหนือธรรมชาติ", gen:"8" },
+  { id:"G8·S16", title:"นักร้องสาวกับเสียงที่ปลุกวิญญาณ",              cat:"ลึกลับ & เหนือธรรมชาติ", gen:"8" },
+  { id:"G8·S17", title:"พนักงานธนาคารผู้มองเห็นบุญวาสนา",               cat:"ลึกลับ & เหนือธรรมชาติ", gen:"8" },
+  { id:"G8·S18", title:"หญิงชราผู้ส่งข้อความจากคนบนฟ้า",               cat:"ลึกลับ & เหนือธรรมชาติ", gen:"8" },
+  { id:"G8·S19", title:"คนขับรถเมล์กับผู้โดยสารที่เป็นเทพ",            cat:"ลึกลับ & เหนือธรรมชาติ", gen:"8" },
+  { id:"G8·S20", title:"สมุดภาพที่เปลี่ยนความจริง",                    cat:"ลึกลับ & เหนือธรรมชาติ", gen:"8" },
+  { id:"G8·S21", title:"เด็กกำพร้าที่ได้รับพรจากพระจันทร์",            cat:"ลึกลับ & เหนือธรรมชาติ", gen:"8" },
+  { id:"G8·S22", title:"ชายหนุ่มผู้ย้อนโชคชะตาได้หนึ่งครั้ง",          cat:"ลึกลับ & เหนือธรรมชาติ", gen:"8" },
+  { id:"G8·S23", title:"เจ้าของร้านขนมที่เติมเต็มคำขอสุดท้าย",         cat:"ลึกลับ & เหนือธรรมชาติ", gen:"8" },
+  { id:"G8·S24", title:"หญิงสาวที่คืนชีวิตให้ดอกไม้แห้ง",              cat:"ลึกลับ & เหนือธรรมชาติ", gen:"8" },
+  { id:"G8·S25", title:"ดาวประจำตัวที่ไม่เคยดับ",                      cat:"ลึกลับ & เหนือธรรมชาติ", gen:"8" },
+
+  // ═══════════════════════════════════════
+  // GENERATOR 9 — Historical, Period Drama & Fate Across Time
+  // ═══════════════════════════════════════
+  { id:"G9·S1",  title:"รักต้องห้ามในยุครัตนโกสินทร์",                 cat:"ย้อนยุค",  gen:"9" },
+  { id:"G9·S2",  title:"สาวยุคปัจจุบันย้อนสู่อดีต",                   cat:"ย้อนยุค",  gen:"9" },
+  { id:"G9·S3",  title:"บันทึกลับของขุนนางหนุ่ม",                      cat:"ย้อนยุค",  gen:"9" },
+  { id:"G9·S4",  title:"เจ้าหญิงผู้ถูกลืม",                           cat:"ย้อนยุค",  gen:"9" },
+  { id:"G9·S5",  title:"คำสาบานใต้ต้นโพธิ์",                          cat:"ย้อนยุค",  gen:"9" },
+  { id:"G9·S6",  title:"ทหารหนุ่มกับหญิงชาววัง",                      cat:"ย้อนยุค",  gen:"9" },
+  { id:"G9·S7",  title:"ผ้าไหมผืนสุดท้าย",                            cat:"ย้อนยุค",  gen:"9" },
+  { id:"G9·S8",  title:"ความรักข้ามภพสองแผ่นดิน",                     cat:"ย้อนยุค",  gen:"9" },
+  { id:"G9·S9",  title:"ทายาทตระกูลเก่ากับความลับในเรือน",             cat:"ย้อนยุค",  gen:"9" },
+  { id:"G9·S10", title:"จดหมายรักจากอดีต",                             cat:"ย้อนยุค",  gen:"9" },
+  { id:"G9·S11", title:"หญิงสาวผู้สืบสายเลือดราชสกุล",                cat:"ย้อนยุค",  gen:"9" },
+  { id:"G9·S12", title:"ชายหนุ่มกับนาฬิกาที่พาไปอีกยุค",              cat:"ย้อนยุค",  gen:"9" },
+  { id:"G9·S13", title:"ความทรงจำของชาติที่ไม่เคยถูกเล่า",             cat:"ย้อนยุค",  gen:"9" },
+  { id:"G9·S14", title:"คู่รักที่พบกันทุกชาติภพ",                      cat:"ย้อนยุค",  gen:"9" },
+  { id:"G9·S15", title:"ศิลปินผู้วาดภาพอนาคต",                        cat:"ย้อนยุค",  gen:"9" },
+  { id:"G9·S16", title:"สงครามพรากรัก",                                cat:"ย้อนยุค",  gen:"9" },
+  { id:"G9·S17", title:"เรือนไทยกับคำสัญญาโบราณ",                     cat:"ย้อนยุค",  gen:"9" },
+  { id:"G9·S18", title:"แหวนหมั้นข้ามเวลา",                           cat:"ย้อนยุค",  gen:"9" },
+  { id:"G9·S19", title:"ลูกหลานผู้ต้องแก้กรรมบรรพบุรุษ",              cat:"ย้อนยุค",  gen:"9" },
+  { id:"G9·S20", title:"ราชเลขากับความลับในวัง",                       cat:"ย้อนยุค",  gen:"9" },
+  { id:"G9·S21", title:"หญิงสาวผู้ได้ยินเสียงจากอดีต",                cat:"ย้อนยุค",  gen:"9" },
+  { id:"G9·S22", title:"คำทำนายแห่งราชวงศ์",                           cat:"ย้อนยุค",  gen:"9" },
+  { id:"G9·S23", title:"ความรักที่รอคอยร้อยปี",                        cat:"ย้อนยุค",  gen:"9" },
+  { id:"G9·S24", title:"ตำราโบราณเปลี่ยนชะตา",                        cat:"ย้อนยุค",  gen:"9" },
+  { id:"G9·S25", title:"โชคชะตาที่ผูกพันมาตั้งแต่ชาติปางก่อน",        cat:"ย้อนยุค",  gen:"9" },
+
+  // ═══════════════════════════════════════
+  // GENERATOR 10 — Crime, Investigation & Psychological Thriller
+  // ═══════════════════════════════════════
+  { id:"G10·S1",  title:"นักสืบสาวกับคดีปริศนาที่ไม่มีศพ",            cat:"อาชญากรรม & ระทึกขวัญ",  gen:"10" },
+  { id:"G10·S2",  title:"ทนายหนุ่มผู้ปกป้องฆาตกร",                    cat:"อาชญากรรม & ระทึกขวัญ",  gen:"10" },
+  { id:"G10·S3",  title:"ภรรยาที่หายไปในคืนฝนตก",                     cat:"อาชญากรรม & ระทึกขวัญ",  gen:"10" },
+  { id:"G10·S4",  title:"พยานคนสุดท้ายที่จำอะไรไม่ได้",               cat:"อาชญากรรม & ระทึกขวัญ",  gen:"10" },
+  { id:"G10·S5",  title:"ตำรวจใหม่กับคดีฆาตกรรมต่อเนื่อง",            cat:"อาชญากรรม & ระทึกขวัญ",  gen:"10" },
+  { id:"G10·S6",  title:"นักข่าวสาวเปิดโปงองค์กรลับ",                 cat:"อาชญากรรม & ระทึกขวัญ",  gen:"10" },
+  { id:"G10·S7",  title:"หมอผู้รู้ว่าใครคือฆาตกร",                    cat:"อาชญากรรม & ระทึกขวัญ",  gen:"10" },
+  { id:"G10·S8",  title:"เด็กชายที่เห็นเหตุการณ์แต่พูดไม่ได้",        cat:"อาชญากรรม & ระทึกขวัญ",  gen:"10" },
+  { id:"G10·S9",  title:"แฮกเกอร์ปริศนาที่ช่วยตำรวจ",                 cat:"อาชญากรรม & ระทึกขวัญ",  gen:"10" },
+  { id:"G10·S10", title:"ครอบครัวสมบูรณ์แบบที่ซ่อนความลับ",           cat:"อาชญากรรม & ระทึกขวัญ",  gen:"10" },
+  { id:"G10·S11", title:"ผู้พิพากษากับคำตัดสินที่เปลี่ยนชีวิต",       cat:"อาชญากรรม & ระทึกขวัญ",  gen:"10" },
+  { id:"G10·S12", title:"นักจิตวิทยากับคนไข้ฆาตกร",                   cat:"อาชญากรรม & ระทึกขวัญ",  gen:"10" },
+  { id:"G10·S13", title:"เพื่อนสนิทที่อาจเป็นคนร้าย",                 cat:"อาชญากรรม & ระทึกขวัญ",  gen:"10" },
+  { id:"G10·S14", title:"ศพในโรงแรมหรู",                               cat:"อาชญากรรม & ระทึกขวัญ",  gen:"10" },
+  { id:"G10·S15", title:"CEO ผู้ถูกแบล็กเมล์",                        cat:"อาชญากรรม & ระทึกขวัญ",  gen:"10" },
+  { id:"G10·S16", title:"คดีลักพาตัวที่โยงถึงอดีต",                   cat:"อาชญากรรม & ระทึกขวัญ",  gen:"10" },
+  { id:"G10·S17", title:"นักสืบเอกชนกับรูปถ่ายใบสุดท้าย",             cat:"อาชญากรรม & ระทึกขวัญ",  gen:"10" },
+  { id:"G10·S18", title:"คนขับแท็กซี่ผู้รู้ความจริง",                 cat:"อาชญากรรม & ระทึกขวัญ",  gen:"10" },
+  { id:"G10·S19", title:"เด็กฝึกงานในบริษัทสีเทา",                    cat:"อาชญากรรม & ระทึกขวัญ",  gen:"10" },
+  { id:"G10·S20", title:"ฆาตกรที่ทิ้งข้อความถึงเหยื่อ",               cat:"อาชญากรรม & ระทึกขวัญ",  gen:"10" },
+  { id:"G10·S21", title:"การหายตัวไปของเจ้าสาว",                       cat:"อาชญากรรม & ระทึกขวัญ",  gen:"10" },
+  { id:"G10·S22", title:"ความทรงจำที่ถูกสร้างขึ้น",                   cat:"อาชญากรรม & ระทึกขวัญ",  gen:"10" },
+  { id:"G10·S23", title:"พี่น้องสองคนกับคดีเดียวกัน",                 cat:"อาชญากรรม & ระทึกขวัญ",  gen:"10" },
+  { id:"G10·S24", title:"นักโทษผู้ยืนยันว่าตนบริสุทธิ์",              cat:"อาชญากรรม & ระทึกขวัญ",  gen:"10" },
+  { id:"G10·S25", title:"คืนที่ทุกคนโกหก",                            cat:"อาชญากรรม & ระทึกขวัญ",  gen:"10" },
+];
+
+// ── State ──
+let activeCat = "all";
+let activeGen = "all";
+let searchTerm = "";
+
+// ── DOM refs ──
+const container    = document.getElementById("series-container");
+const noResults    = document.getElementById("no-results");
+const searchInput  = document.getElementById("search-input");
+const resultNum    = document.getElementById("result-num");
+const statShown    = document.getElementById("stat-shown");
+const catFilters   = document.querySelectorAll("#cat-filters .pill");
+const genFilters   = document.querySelectorAll("#gen-filters .pill");
+
+// ── Render ──
+function renderCards() {
+  const q = searchTerm.toLowerCase().trim();
+
+  const filtered = seriesData.filter(item => {
+    const matchSearch = !q ||
+      item.title.toLowerCase().includes(q) ||
+      item.id.toLowerCase().includes(q);
+    const matchCat = activeCat === "all" || item.cat === activeCat;
+    const matchGen = activeGen === "all" || item.gen === activeGen;
+    return matchSearch && matchCat && matchGen;
+  });
+
+  // Remove old cards (keep no-results div)
+  container.querySelectorAll(".card").forEach(el => el.remove());
+
+  if (filtered.length === 0) {
+    noResults.style.display = "block";
+  } else {
+    noResults.style.display = "none";
+    const frag = document.createDocumentFragment();
+    filtered.forEach(item => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.setAttribute("data-gen", item.gen);
+      card.innerHTML = `
+        <div class="card-header">
+          <span class="series-id">${item.id}</span>
+          <span class="gen-tag" data-gen="${item.gen}">Gen ${item.gen}</span>
+        </div>
+        <div class="card-title">${item.title}</div>
+        <span class="cat-badge">${item.cat}</span>
+      `;
+      frag.appendChild(card);
+    });
+    container.appendChild(frag);
+  }
+
+  resultNum.textContent = filtered.length;
+  statShown.textContent = filtered.length;
+}
+
+// ── Events ──
+searchInput.addEventListener("input", e => {
+  searchTerm = e.target.value;
+  renderCards();
+});
+
+catFilters.forEach(pill => {
+  pill.addEventListener("click", () => {
+    catFilters.forEach(p => p.classList.remove("active"));
+    pill.classList.add("active");
+    activeCat = pill.getAttribute("data-cat");
+    renderCards();
+  });
+});
+
+genFilters.forEach(pill => {
+  pill.addEventListener("click", () => {
+    genFilters.forEach(p => p.classList.remove("active"));
+    pill.classList.add("active");
+    activeGen = pill.getAttribute("data-gen");
+    renderCards();
+  });
+});
+
+// ── Initial render ──
+renderCards();
+</script>
+
+</body>
+</html>

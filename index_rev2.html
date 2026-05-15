@@ -1,0 +1,1836 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thai Drama Series Explorer | Series Mapping</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Anuphan:wght@300;400;600&display=swap" rel="stylesheet" />
+    <style>
+        /* Meta Style */
+        :root {
+            --meta-blue: #0064E0;
+            --meta-blue-hover: #0143B5;
+            --meta-blue-pressed: #004BB9;
+            --white: #FFFFFF;
+            --soft-gray: #F1F4F7;
+            --warm-gray: #F7F8FA;
+            --near-black: #1C1E21;
+            --charcoal: #1C2B33;
+            --slate: #5D6C7B;
+            --secondary: #65676B;
+            --divider: #DEE3E9;
+            --border: #CBD2D9;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', 'Anuphan', sans-serif;
+            background: var(--white);
+            color: var(--charcoal);
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+
+        /* Nav */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(241,244,247,0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+        }
+        .nav-inner {
+            max-width: 1440px; margin: 0 auto; padding: 0 40px;
+            height: 56px; display: flex; align-items: center; justify-content: space-between;
+        }
+        .nav-logo { font-size: 17px; font-weight: 700; color: var(--charcoal); text-decoration: none; letter-spacing: -0.16px; }
+
+        /* Hero */
+        .hero-dark {
+            background: var(--near-black);
+            padding: 80px 40px;
+            text-align: center;
+        }
+        .hero-heading {
+            font-size: clamp(32px, 5vw, 56px); font-weight: 500; color: var(--white); margin-bottom: 16px;
+        }
+        .hero-sub { font-size: 18px; color: var(--slate); max-width: 600px; margin: 0 auto 32px; }
+
+        /* Stats */
+        .stats-blue { background: var(--meta-blue); padding: 40px; }
+        .stats-inner {
+            max-width: 1440px; margin: 0 auto; display: flex; justify-content: center; gap: 80px; flex-wrap: wrap;
+        }
+        .stat-item { text-align: center; }
+        .stat-number { font-size: 36px; font-weight: 500; color: var(--white); }
+        .stat-label { font-size: 14px; color: rgba(255,255,255,0.72); margin-top: 4px; }
+
+        /* Container */
+        .container { max-width: 1440px; margin: 0 auto; padding: 40px; }
+
+        /* Controls */
+        .controls-header {
+            display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;
+        }
+        .search-input {
+            font-family: inherit; font-size: 16px; padding: 10px 16px;
+            border: 1px solid var(--border); border-radius: 8px; width: 300px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .search-input:focus { border-color: var(--meta-blue); box-shadow: 0 0 0 3px rgba(0,100,224,0.2); outline: none; }
+
+        .filter-group { margin-bottom: 24px; }
+        .filter-label { font-size: 14px; font-weight: 700; color: var(--charcoal); margin-bottom: 8px; display: block; }
+        .filter-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+        
+        .pill-filter {
+            font-family: inherit; font-size: 14px; padding: 8px 20px;
+            border-radius: 100px; border: 1px solid var(--divider);
+            background: var(--white); color: var(--slate); cursor: pointer;
+            transition: all 0.2s;
+        }
+        .pill-filter:hover { border-color: var(--meta-blue); color: var(--meta-blue); transform: scale(1.05); }
+        .pill-filter.active { background: var(--meta-blue); color: var(--white); border-color: var(--meta-blue); }
+
+        /* Categories & Grid */
+        .category-section { margin-bottom: 40px; }
+        .category-heading {
+            font-size: 22px; font-weight: 700; color: var(--charcoal);
+            margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--divider);
+            display: flex; align-items: center; cursor: pointer;
+            transition: color 0.2s, border-color 0.2s;
+        }
+        .category-heading:hover { color: var(--meta-blue); border-bottom-color: var(--meta-blue); }
+        .category-heading::after {
+            content: '▼'; font-size: 14px; color: var(--meta-blue); transition: transform 0.3s;
+        }
+        .category-heading.collapsed::after { transform: rotate(-90deg); }
+        .cat-count-badge {
+            font-size: 14px; background: var(--soft-gray); padding: 4px 12px;
+            border-radius: 100px; color: var(--slate); margin-right: auto; margin-left: 12px;
+        }
+
+        .series-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .series-grid.collapsed { display: none; }
+        
+        .card {
+            background: var(--warm-gray); border-radius: 16px; padding: 24px;
+            display: flex; flex-direction: column; gap: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid var(--divider);
+            cursor: pointer;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.05);
+            border-color: var(--meta-blue);
+        }
+        
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .series-id { font-size: 14px; font-weight: 700; color: var(--meta-blue); }
+        .source-tag { font-size: 12px; background: var(--divider); padding: 4px 10px; border-radius: 100px; color: var(--charcoal); }
+        
+        .title { font-size: 18px; font-weight: 600; color: var(--charcoal); line-height: 1.4; flex-grow: 1; }
+        
+        .category {
+            align-self: flex-start; font-size: 12px; padding: 4px 12px;
+            background: var(--soft-gray); border: 1px solid var(--divider);
+            border-radius: 100px; color: var(--secondary); font-weight: 500;
+        }
+
+        .no-results {
+            grid-column: 1 / -1; text-align: center; padding: 60px 0;
+            color: var(--slate); font-size: 18px; display: none;
+        }
+
+        @media (max-width: 768px) {
+            .nav-inner { padding: 0 20px; }
+            .hero-dark { padding: 60px 20px; }
+            .container { padding: 20px; }
+            .search-input { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-inner">
+            <a class="nav-logo" href="#">Thai Drama Series Explorer</a>
+        </div>
+    </nav>
+
+    <section class="hero-dark">
+        <h1 class="hero-heading">Series Mapping Dashboard</h1>
+        <p class="hero-sub">คลังเนื้อเรื่อง Mini-Series สำหรับ Content Creators (10 Generators)</p>
+    </section>
+
+    <div class="stats-blue">
+        <div class="stats-inner">
+            <div class="stat-item"><div class="stat-number" id="total-count">0</div><div class="stat-label">Total Stories</div></div>
+            <div class="stat-item"><div class="stat-number" id="cat-count">0</div><div class="stat-label">Categories</div></div>
+            <div class="stat-item"><div class="stat-number">10</div><div class="stat-label">Generators</div></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="controls-header">
+            <div>
+                <h2 style="font-size: 28px; margin-bottom: 8px;">Explore Stories</h2>
+                <p style="color: var(--slate);">Filter and search through the entire collection.</p>
+            </div>
+            <input type="text" id="search-input" class="search-input" placeholder="ค้นหาชื่อเรื่อง หรือ Series ID...">
+        </div>
+
+        <div class="filter-group">
+            <span class="filter-label">Generators</span>
+            <div class="filter-pills" id="file-filters">
+                <button class="pill-filter active" data-file="all">All</button>
+            </div>
+        </div>
+
+        <div class="filter-group">
+            <span class="filter-label">Categories</span>
+            <div class="filter-pills" id="category-filters">
+                <button class="pill-filter active" data-cat="all">All</button>
+            </div>
+        </div>
+
+        <div id="series-container">
+            <div class="no-results" id="no-results">ไม่พบผลการค้นหา (No results found)</div>
+        </div>
+    </div>
+
+    <script>
+        const seriesData = [
+    {
+        "id": "Series1",
+        "title": "แฟนปลอมกลายเป็นรักจริง",
+        "cat": "โรแมนซ์",
+        "file": "Generator 1"
+    },
+    {
+        "id": "Series2",
+        "title": "แต่งงานหลอกเพื่อช่วยครอบครัว",
+        "cat": "โรแมนซ์",
+        "file": "Generator 1"
+    },
+    {
+        "id": "Series3",
+        "title": "รักแรกกลับมาในวันที่สายเกินไป",
+        "cat": "โรแมนซ์",
+        "file": "Generator 1"
+    },
+    {
+        "id": "Series4",
+        "title": "รักสามเส้าในหมู่เพื่อน",
+        "cat": "โรแมนซ์",
+        "file": "Generator 1"
+    },
+    {
+        "id": "Series5",
+        "title": "คนธรรมดาที่ซ่อนฐานะมหาเศรษฐี",
+        "cat": "โรแมนซ์",
+        "file": "Generator 1"
+    },
+    {
+        "id": "Series6",
+        "title": "ลูกสาวที่ถูกมองข้าม",
+        "cat": "ดราม่าครอบครัว",
+        "file": "Generator 1"
+    },
+    {
+        "id": "Series7",
+        "title": "พี่น้องแย่งมรดก",
+        "cat": "ดราม่าครอบครัว",
+        "file": "Generator 1"
+    },
+    {
+        "id": "Series8",
+        "title": "แม่เลี้ยงกับลูกติด",
+        "cat": "ดราม่าครอบครัว",
+        "file": "Generator 1"
+    },
+    {
+        "id": "Series9",
+        "title": "พ่อที่หายไปกลับมา",
+        "cat": "ดราม่าครอบครัว",
+        "file": "Generator 1"
+    },
+    {
+        "id": "Series10",
+        "title": "ความลับที่ซ่อนมา 20 ปี",
+        "cat": "ดราม่าครอบครัว",
+        "file": "Generator 1"
+    },
+    {
+        "id": "Series11",
+        "title": "เลขาที่ไม่มีใครเห็นค่า",
+        "cat": "ดราม่าที่ทำงาน",
+        "file": "Generator 1"
+    },
+    {
+        "id": "Series12",
+        "title": "เด็กฝึกงานพลิกบริษัท",
+        "cat": "ดราม่าที่ทำงาน",
+        "file": "Generator 1"
+    },
+    {
+        "id": "Series13",
+        "title": "เจ้านายเย็นชากับลูกน้องเก่ง",
+        "cat": "ดราม่าที่ทำงาน",
+        "file": "Generator 1"
+    },
+    {
+        "id": "Series14",
+        "title": "เพื่อนร่วมงานแทงข้างหลัง",
+        "cat": "ดราม่าที่ทำงาน",
+        "file": "Generator 1"
+    },
+    {
+        "id": "Series15",
+        "title": "CEO ปลอมตัวเป็นพนักงาน",
+        "cat": "ดราม่าที่ทำงาน",
+        "file": "Generator 1"
+    },
+    {
+        "id": "Series16",
+        "title": "แม่ค้าธรรมดากับลูกค้าผู้มีอิทธิพล",
+        "cat": "ดราม่าธุรกิจและลูกค้า",
+        "file": "Generator 1"
+    },
+    {
+        "id": "Series17",
+        "title": "ร้านกาแฟเล็กกับนักลงทุนใหญ่",
+        "cat": "ดราม่าธุรกิจและลูกค้า",
+        "file": "Generator 1"
+    },
+    {
+        "id": "Series18",
+        "title": "ลูกค้าประจำที่มีความลับ",
+        "cat": "ดราม่าธุรกิจและลูกค้า",
+        "file": "Generator 1"
+    },
+    {
+        "id": "Series19",
+        "title": "อินฟลูเอนเซอร์ทำลายร้าน",
+        "cat": "ดราม่าธุรกิจและลูกค้า",
+        "file": "Generator 1"
+    },
+    {
+        "id": "Series20",
+        "title": "เจ้าของร้านกับคู่แข่งหัวใจเดียวกัน",
+        "cat": "ดราม่าธุรกิจและลูกค้า",
+        "file": "Generator 1"
+    },
+    {
+        "id": "Series21",
+        "title": "คนขับแท็กซี่ช่วยชีวิตเศรษฐี",
+        "cat": "ดราม่าชีวิตประจำวัน",
+        "file": "Generator 1"
+    },
+    {
+        "id": "Series22",
+        "title": "เพื่อนบ้านที่ดูน่ารำคาญ",
+        "cat": "ดราม่าชีวิตประจำวัน",
+        "file": "Generator 1"
+    },
+    {
+        "id": "Series23",
+        "title": "ครูพิเศษผู้เปลี่ยนชีวิตเด็ก",
+        "cat": "ดราม่าชีวิตประจำวัน",
+        "file": "Generator 1"
+    },
+    {
+        "id": "Series24",
+        "title": "พยาบาลกับผู้ป่วยลึกลับ",
+        "cat": "ดราม่าชีวิตประจำวัน",
+        "file": "Generator 1"
+    },
+    {
+        "id": "Series25",
+        "title": "เด็กส่งของกับหญิงสาวปริศนา",
+        "cat": "ดราม่าชีวิตประจำวัน",
+        "file": "Generator 1"
+    },
+    {
+        "id": "Series1",
+        "title": "รักข้ามชนชั้นของเจ้าของโรงแรมกับพนักงานต้อนรับ",
+        "cat": "โรแมนซ์",
+        "file": "Generator 2"
+    },
+    {
+        "id": "Series2",
+        "title": "คู่กัดที่ต้องแกล้งเป็นคู่รัก",
+        "cat": "โรแมนซ์",
+        "file": "Generator 2"
+    },
+    {
+        "id": "Series3",
+        "title": "คนรักเก่าที่กลับมาพร้อมลูกน้อย",
+        "cat": "โรแมนซ์",
+        "file": "Generator 2"
+    },
+    {
+        "id": "Series4",
+        "title": "นักร้องดังตกหลุมรักครูดนตรี",
+        "cat": "โรแมนซ์",
+        "file": "Generator 2"
+    },
+    {
+        "id": "Series5",
+        "title": "หญิงสาวธรรมดาที่ช่วยทายาทตระกูลใหญ่",
+        "cat": "โรแมนซ์",
+        "file": "Generator 2"
+    },
+    {
+        "id": "Series6",
+        "title": "ยายที่ถูกลูกหลานทอดทิ้ง",
+        "cat": "ดราม่าครอบครัว",
+        "file": "Generator 2"
+    },
+    {
+        "id": "Series7",
+        "title": "พี่สาวเสียสละเพื่อให้น้องได้เรียน",
+        "cat": "ดราม่าครอบครัว",
+        "file": "Generator 2"
+    },
+    {
+        "id": "Series8",
+        "title": "ลูกชายที่เพิ่งรู้ว่าถูกเก็บมาเลี้ยง",
+        "cat": "ดราม่าครอบครัว",
+        "file": "Generator 2"
+    },
+    {
+        "id": "Series9",
+        "title": "ครอบครัวแตกแยกเพราะคำโกหก",
+        "cat": "ดราม่าครอบครัว",
+        "file": "Generator 2"
+    },
+    {
+        "id": "Series10",
+        "title": "มรดกลับที่เปลี่ยนชีวิตทุกคน",
+        "cat": "ดราม่าครอบครัว",
+        "file": "Generator 2"
+    },
+    {
+        "id": "Series11",
+        "title": "พนักงานบัญชีที่เปิดโปงการโกง",
+        "cat": "ดราม่าที่ทำงาน",
+        "file": "Generator 2"
+    },
+    {
+        "id": "Series12",
+        "title": "หัวหน้าสาวกับทีมที่ไม่ยอมรับ",
+        "cat": "ดราม่าที่ทำงาน",
+        "file": "Generator 2"
+    },
+    {
+        "id": "Series13",
+        "title": "โปรแกรมเมอร์อัจฉริยะที่ถูกขโมยผลงาน",
+        "cat": "ดราม่าที่ทำงาน",
+        "file": "Generator 2"
+    },
+    {
+        "id": "Series14",
+        "title": "ฝ่ายขายที่ถูกใส่ร้าย",
+        "cat": "ดราม่าที่ทำงาน",
+        "file": "Generator 2"
+    },
+    {
+        "id": "Series15",
+        "title": "เจ้าของบริษัทหญิงปลอมตัวเข้ามาตรวจงาน",
+        "cat": "ดราม่าที่ทำงาน",
+        "file": "Generator 2"
+    },
+    {
+        "id": "Series16",
+        "title": "ร้านข้าวแกงเล็กกับนักชิมชื่อดัง",
+        "cat": "ดราม่าธุรกิจและลูกค้า",
+        "file": "Generator 2"
+    },
+    {
+        "id": "Series17",
+        "title": "ช่างซ่อมมือถือกับลูกค้าผู้ลึกลับ",
+        "cat": "ดราม่าธุรกิจและลูกค้า",
+        "file": "Generator 2"
+    },
+    {
+        "id": "Series18",
+        "title": "ร้านดอกไม้กับลูกค้าประจำผู้ไม่เปิดเผยตัว",
+        "cat": "ดราม่าธุรกิจและลูกค้า",
+        "file": "Generator 2"
+    },
+    {
+        "id": "Series19",
+        "title": "แม่ค้าออนไลน์ถูกรีวิวโจมตี",
+        "cat": "ดราม่าธุรกิจและลูกค้า",
+        "file": "Generator 2"
+    },
+    {
+        "id": "Series20",
+        "title": "เจ้าของร้านเสื้อผ้ากับคู่แข่งในตลาด",
+        "cat": "ดราม่าธุรกิจและลูกค้า",
+        "file": "Generator 2"
+    },
+    {
+        "id": "Series21",
+        "title": "วินมอเตอร์ไซค์กับผู้โดยสารที่เปลี่ยนชีวิตเขา",
+        "cat": "ดราม่าชีวิตประจำวัน",
+        "file": "Generator 2"
+    },
+    {
+        "id": "Series22",
+        "title": "เจ้าหน้าที่รักษาความปลอดภัยผู้มีอดีต",
+        "cat": "ดราม่าชีวิตประจำวัน",
+        "file": "Generator 2"
+    },
+    {
+        "id": "Series23",
+        "title": "คนเก็บขยะที่คืนเงินล้านให้เจ้าของ",
+        "cat": "ดราม่าชีวิตประจำวัน",
+        "file": "Generator 2"
+    },
+    {
+        "id": "Series24",
+        "title": "ครูอนุบาลกับเด็กที่ไม่มีใครเข้าใจ",
+        "cat": "ดราม่าชีวิตประจำวัน",
+        "file": "Generator 2"
+    },
+    {
+        "id": "Series25",
+        "title": "พนักงานร้านสะดวกซื้อกับลูกค้าประหลาด",
+        "cat": "ดราม่าชีวิตประจำวัน",
+        "file": "Generator 2"
+    },
+    {
+        "id": "Series1",
+        "title": "หมอสาวกับคนไข้ที่ปิดบังตัวตน",
+        "cat": "โรแมนซ์",
+        "file": "Generator 3"
+    },
+    {
+        "id": "Series2",
+        "title": "เจ้าสาวที่หนีงานแต่งมาพบรักแท้",
+        "cat": "โรแมนซ์",
+        "file": "Generator 3"
+    },
+    {
+        "id": "Series3",
+        "title": "ช่างภาพกับนางแบบผู้เย็นชา",
+        "cat": "โรแมนซ์",
+        "file": "Generator 3"
+    },
+    {
+        "id": "Series4",
+        "title": "เจ้าของฟาร์มกับนักธุรกิจสาวจากกรุงเทพฯ",
+        "cat": "โรแมนซ์",
+        "file": "Generator 3"
+    },
+    {
+        "id": "Series5",
+        "title": "รุ่นพี่มหาวิทยาลัยที่ไม่เคยลืมรักแรก",
+        "cat": "โรแมนซ์",
+        "file": "Generator 3"
+    },
+    {
+        "id": "Series6",
+        "title": "พ่อเลี้ยงเดี่ยวที่สู้เพื่อลูก",
+        "cat": "ดราม่าครอบครัว",
+        "file": "Generator 3"
+    },
+    {
+        "id": "Series7",
+        "title": "ลูกสาวที่กลับมาดูแลแม่ป่วย",
+        "cat": "ดราม่าครอบครัว",
+        "file": "Generator 3"
+    },
+    {
+        "id": "Series8",
+        "title": "พี่น้องที่คืนดีกันหลังงานศพ",
+        "cat": "ดราม่าครอบครัว",
+        "file": "Generator 3"
+    },
+    {
+        "id": "Series9",
+        "title": "เด็กกำพร้าที่รวมครอบครัวใหม่",
+        "cat": "ดราม่าครอบครัว",
+        "file": "Generator 3"
+    },
+    {
+        "id": "Series10",
+        "title": "ความลับในสมุดบันทึกของคุณตา",
+        "cat": "ดราม่าครอบครัว",
+        "file": "Generator 3"
+    },
+    {
+        "id": "Series11",
+        "title": "นักข่าวสาวที่เปิดโปงผู้บริหาร",
+        "cat": "ดราม่าที่ทำงาน",
+        "file": "Generator 3"
+    },
+    {
+        "id": "Series12",
+        "title": "เชฟมือหนึ่งที่ถูกลดตำแหน่ง",
+        "cat": "ดราม่าที่ทำงาน",
+        "file": "Generator 3"
+    },
+    {
+        "id": "Series13",
+        "title": "วิศวกรหนุ่มกับโครงการที่ถูกขัดขวาง",
+        "cat": "ดราม่าที่ทำงาน",
+        "file": "Generator 3"
+    },
+    {
+        "id": "Series14",
+        "title": "HR ที่ต้องเลือกระหว่างความถูกต้องกับหน้าที่",
+        "cat": "ดราม่าที่ทำงาน",
+        "file": "Generator 3"
+    },
+    {
+        "id": "Series15",
+        "title": "นักลงทุนที่ปลอมเป็นพนักงานฝึกหัด",
+        "cat": "ดราม่าที่ทำงาน",
+        "file": "Generator 3"
+    },
+    {
+        "id": "Series16",
+        "title": "ร้านก๋วยเตี๋ยวที่ถูกมหาเศรษฐีช่วยไว้",
+        "cat": "ดราม่าธุรกิจและลูกค้า",
+        "file": "Generator 3"
+    },
+    {
+        "id": "Series17",
+        "title": "สปาเล็กๆ กับลูกค้าต่างชาติผู้มีอิทธิพล",
+        "cat": "ดราม่าธุรกิจและลูกค้า",
+        "file": "Generator 3"
+    },
+    {
+        "id": "Series18",
+        "title": "คนส่งพัสดุกับลูกค้าสาวที่รอใครบางคน",
+        "cat": "ดราม่าธุรกิจและลูกค้า",
+        "file": "Generator 3"
+    },
+    {
+        "id": "Series19",
+        "title": "เจ้าของเบเกอรี่ที่ถูกคัดลอกสูตร",
+        "cat": "ดราม่าธุรกิจและลูกค้า",
+        "file": "Generator 3"
+    },
+    {
+        "id": "Series20",
+        "title": "ร้านหนังสือเก่ากับนักสะสมผู้ลึกลับ",
+        "cat": "ดราม่าธุรกิจและลูกค้า",
+        "file": "Generator 3"
+    },
+    {
+        "id": "Series21",
+        "title": "คนสวนกับเจ้าของบ้านผู้โดดเดี่ยว",
+        "cat": "ดราม่าชีวิตประจำวัน",
+        "file": "Generator 3"
+    },
+    {
+        "id": "Series22",
+        "title": "พนักงานรถไฟฟ้ากับเด็กที่หลงทาง",
+        "cat": "ดราม่าชีวิตประจำวัน",
+        "file": "Generator 3"
+    },
+    {
+        "id": "Series23",
+        "title": "เจ้าของหอพักกับผู้เช่าปริศนา",
+        "cat": "ดราม่าชีวิตประจำวัน",
+        "file": "Generator 3"
+    },
+    {
+        "id": "Series24",
+        "title": "ช่างตัดผมที่เปลี่ยนชีวิตลูกค้า",
+        "cat": "ดราม่าชีวิตประจำวัน",
+        "file": "Generator 3"
+    },
+    {
+        "id": "Series25",
+        "title": "คนดูแลสัตว์กับหญิงสาวผู้หนีอดีต",
+        "cat": "ดราม่าชีวิตประจำวัน",
+        "file": "Generator 3"
+    },
+    {
+        "id": "Series1",
+        "title": "สถาปนิกหนุ่มกับเจ้าของบ้านสาว",
+        "cat": "โรแมนซ์",
+        "file": "Generator 4"
+    },
+    {
+        "id": "Series2",
+        "title": "นักเขียนนิยายกับแฟนคลับคนแรก",
+        "cat": "โรแมนซ์",
+        "file": "Generator 4"
+    },
+    {
+        "id": "Series3",
+        "title": "นักกฎหมายกับคู่ความที่กลายเป็นรัก",
+        "cat": "โรแมนซ์",
+        "file": "Generator 4"
+    },
+    {
+        "id": "Series4",
+        "title": "บาริสต้าหนุ่มกับลูกค้าประจำ",
+        "cat": "โรแมนซ์",
+        "file": "Generator 4"
+    },
+    {
+        "id": "Series5",
+        "title": "ผู้จัดการโรงแรมกับนักท่องเที่ยวสาว",
+        "cat": "โรแมนซ์",
+        "file": "Generator 4"
+    },
+    {
+        "id": "Series6",
+        "title": "คุณปู่ที่รอการกลับมาของหลาน",
+        "cat": "ดราม่าครอบครัว",
+        "file": "Generator 4"
+    },
+    {
+        "id": "Series7",
+        "title": "แม่ที่ยอมทำทุกอย่างเพื่อลูก",
+        "cat": "ดราม่าครอบครัว",
+        "file": "Generator 4"
+    },
+    {
+        "id": "Series8",
+        "title": "พี่ชายที่รับผิดแทนน้อง",
+        "cat": "ดราม่าครอบครัว",
+        "file": "Generator 4"
+    },
+    {
+        "id": "Series9",
+        "title": "ครอบครัวที่ต้องเริ่มต้นใหม่หลังไฟไหม้",
+        "cat": "ดราม่าครอบครัว",
+        "file": "Generator 4"
+    },
+    {
+        "id": "Series10",
+        "title": "จดหมายฉบับสุดท้ายของพ่อ",
+        "cat": "ดราม่าครอบครัว",
+        "file": "Generator 4"
+    },
+    {
+        "id": "Series11",
+        "title": "ดีไซเนอร์สาวที่ถูกหัวหน้ากดดัน",
+        "cat": "ดราม่าที่ทำงาน",
+        "file": "Generator 4"
+    },
+    {
+        "id": "Series12",
+        "title": "นักวิเคราะห์ข้อมูลผู้ค้นพบความผิดปกติ",
+        "cat": "ดราม่าที่ทำงาน",
+        "file": "Generator 4"
+    },
+    {
+        "id": "Series13",
+        "title": "ฝ่ายขายมือหนึ่งที่ถูกทรยศ",
+        "cat": "ดราม่าที่ทำงาน",
+        "file": "Generator 4"
+    },
+    {
+        "id": "Series14",
+        "title": "โปรดิวเซอร์รายการที่ต้องเลือกระหว่างชื่อเสียงกับความจริง",
+        "cat": "ดราม่าที่ทำงาน",
+        "file": "Generator 4"
+    },
+    {
+        "id": "Series15",
+        "title": "ผู้ถือหุ้นใหญ่ปลอมตัวเป็นแม่บ้าน",
+        "cat": "ดราม่าที่ทำงาน",
+        "file": "Generator 4"
+    },
+    {
+        "id": "Series16",
+        "title": "ร้านผลไม้ที่รอดจากรีวิวของเศรษฐี",
+        "cat": "ดราม่าธุรกิจและลูกค้า",
+        "file": "Generator 4"
+    },
+    {
+        "id": "Series17",
+        "title": "ร้านทองกับลูกค้าผู้ตามหาของสำคัญ",
+        "cat": "ดราม่าธุรกิจและลูกค้า",
+        "file": "Generator 4"
+    },
+    {
+        "id": "Series18",
+        "title": "อู่ซ่อมรถกับเจ้าของรถสาวผู้เข้มแข็ง",
+        "cat": "ดราม่าธุรกิจและลูกค้า",
+        "file": "Generator 4"
+    },
+    {
+        "id": "Series19",
+        "title": "ร้านอาหารครอบครัวที่ถูกกดดันจากห้างใหญ่",
+        "cat": "ดราม่าธุรกิจและลูกค้า",
+        "file": "Generator 4"
+    },
+    {
+        "id": "Series20",
+        "title": "ร้านเครื่องเขียนกับครูผู้เปลี่ยนชะตา",
+        "cat": "ดราม่าธุรกิจและลูกค้า",
+        "file": "Generator 4"
+    },
+    {
+        "id": "Series21",
+        "title": "บุรุษไปรษณีย์กับจดหมายที่เปลี่ยนชีวิต",
+        "cat": "ดราม่าชีวิตประจำวัน",
+        "file": "Generator 4"
+    },
+    {
+        "id": "Series22",
+        "title": "พนักงานธนาคารกับลูกค้าสูงวัย",
+        "cat": "ดราม่าชีวิตประจำวัน",
+        "file": "Generator 4"
+    },
+    {
+        "id": "Series23",
+        "title": "อาสาสมัครกับเด็กเร่ร่อน",
+        "cat": "ดราม่าชีวิตประจำวัน",
+        "file": "Generator 4"
+    },
+    {
+        "id": "Series24",
+        "title": "คนขายล็อตเตอรี่กับหญิงผู้สิ้นหวัง",
+        "cat": "ดราม่าชีวิตประจำวัน",
+        "file": "Generator 4"
+    },
+    {
+        "id": "Series25",
+        "title": "เจ้าหน้าที่กู้ภัยกับเหตุการณ์ไม่คาดคิด",
+        "cat": "ดราม่าชีวิตประจำวัน",
+        "file": "Generator 4"
+    },
+    {
+        "id": "Series1",
+        "title": "นักดนตรีข้างถนนกับทายาทบริษัทใหญ่",
+        "cat": "โรแมนซ์",
+        "file": "Generator 5"
+    },
+    {
+        "id": "Series2",
+        "title": "ครูสอนภาษาไทยกับนักธุรกิจเกาหลี",
+        "cat": "โรแมนซ์",
+        "file": "Generator 5"
+    },
+    {
+        "id": "Series3",
+        "title": "นักกีฬาเก่ากับหมอผู้เยียวยาหัวใจ",
+        "cat": "โรแมนซ์",
+        "file": "Generator 5"
+    },
+    {
+        "id": "Series4",
+        "title": "เจ้าของแกลเลอรีกับศิลปินไร้ชื่อ",
+        "cat": "โรแมนซ์",
+        "file": "Generator 5"
+    },
+    {
+        "id": "Series5",
+        "title": "สาวออฟฟิศกับเพื่อนบ้านสุดเพอร์เฟกต์",
+        "cat": "โรแมนซ์",
+        "file": "Generator 5"
+    },
+    {
+        "id": "Series6",
+        "title": "หลานชายที่กลับบ้านหลังสิบปี",
+        "cat": "ดราม่าครอบครัว",
+        "file": "Generator 5"
+    },
+    {
+        "id": "Series7",
+        "title": "แม่บ้านที่กลายเป็นเสาหลักของครอบครัว",
+        "cat": "ดราม่าครอบครัว",
+        "file": "Generator 5"
+    },
+    {
+        "id": "Series8",
+        "title": "พี่น้องที่ตามหาพ่อแท้ๆ",
+        "cat": "ดราม่าครอบครัว",
+        "file": "Generator 5"
+    },
+    {
+        "id": "Series9",
+        "title": "ลูกคนเล็กที่พิสูจน์ตัวเอง",
+        "cat": "ดราม่าครอบครัว",
+        "file": "Generator 5"
+    },
+    {
+        "id": "Series10",
+        "title": "มรดกชิ้นเดียวที่รวมใจทุกคน",
+        "cat": "ดราม่าครอบครัว",
+        "file": "Generator 5"
+    },
+    {
+        "id": "Series11",
+        "title": "เจ้าหน้าที่ไอทีที่ช่วยบริษัทจากวิกฤต",
+        "cat": "ดราม่าที่ทำงาน",
+        "file": "Generator 5"
+    },
+    {
+        "id": "Series12",
+        "title": "พนักงานต้อนรับที่รู้ความลับของผู้บริหาร",
+        "cat": "ดราม่าที่ทำงาน",
+        "file": "Generator 5"
+    },
+    {
+        "id": "Series13",
+        "title": "นักการตลาดที่พลิกยอดขายด้วยไอเดียเดียว",
+        "cat": "ดราม่าที่ทำงาน",
+        "file": "Generator 5"
+    },
+    {
+        "id": "Series14",
+        "title": "ทนายหนุ่มที่ถูกบังคับให้ปกปิดความจริง",
+        "cat": "ดราม่าที่ทำงาน",
+        "file": "Generator 5"
+    },
+    {
+        "id": "Series15",
+        "title": "ประธานบริษัทปลอมตัวเป็นไรเดอร์",
+        "cat": "ดราม่าที่ทำงาน",
+        "file": "Generator 5"
+    },
+    {
+        "id": "Series16",
+        "title": "ร้านส้มตำเล็กๆ กับลูกค้าต่างชาติผู้ทรงอิทธิพล",
+        "cat": "ดราม่าธุรกิจและลูกค้า",
+        "file": "Generator 5"
+    },
+    {
+        "id": "Series17",
+        "title": "ร้านเครื่องประดับทำมือกับเจ้าสาวผู้สิ้นหวัง",
+        "cat": "ดราม่าธุรกิจและลูกค้า",
+        "file": "Generator 5"
+    },
+    {
+        "id": "Series18",
+        "title": "ร้านสัตว์เลี้ยงกับลูกค้าที่ตามหาสุนัขหาย",
+        "cat": "ดราม่าธุรกิจและลูกค้า",
+        "file": "Generator 5"
+    },
+    {
+        "id": "Series19",
+        "title": "ผู้ขายของมือสองกับของล้ำค่าที่ไม่มีใครรู้",
+        "cat": "ดราม่าธุรกิจและลูกค้า",
+        "file": "Generator 5"
+    },
+    {
+        "id": "Series20",
+        "title": "ร้านชานมกับคู่แข่งที่กลายเป็นหุ้นส่วน",
+        "cat": "ดราม่าธุรกิจและลูกค้า",
+        "file": "Generator 5"
+    },
+    {
+        "id": "Series21",
+        "title": "คนขับรถตู้กับผู้โดยสารที่กำลังหนีปัญหา",
+        "cat": "ดราม่าชีวิตประจำวัน",
+        "file": "Generator 5"
+    },
+    {
+        "id": "Series22",
+        "title": "เจ้าของร้านซักรีดกับความลับในกระเป๋าเสื้อ",
+        "cat": "ดราม่าชีวิตประจำวัน",
+        "file": "Generator 5"
+    },
+    {
+        "id": "Series23",
+        "title": "ครูสอนว่ายน้ำกับเด็กที่กลัวน้ำ",
+        "cat": "ดราม่าชีวิตประจำวัน",
+        "file": "Generator 5"
+    },
+    {
+        "id": "Series24",
+        "title": "เจ้าหน้าที่เทศบาลกับหญิงชราที่อยู่ลำพัง",
+        "cat": "ดราม่าชีวิตประจำวัน",
+        "file": "Generator 5"
+    },
+    {
+        "id": "Series25",
+        "title": "พนักงานส่งอาหารกับคำสั่งซื้อสุดท้าย",
+        "cat": "ดราม่าชีวิตประจำวัน",
+        "file": "Generator 5"
+    },
+    {
+        "id": "Series1",
+        "title": "หญิงสาวผู้มองเห็นวิญญาณ",
+        "cat": "ลึกลับ ตำนาน ปาฏิหาริย์ คำสาป และพลังเหนือธรรมชาติ",
+        "file": "Generator 6"
+    },
+    {
+        "id": "Series2",
+        "title": "บ้านร้างที่เรียกชื่อเจ้าของใหม่",
+        "cat": "ลึกลับ ตำนาน ปาฏิหาริย์ คำสาป และพลังเหนือธรรมชาติ",
+        "file": "Generator 6"
+    },
+    {
+        "id": "Series3",
+        "title": "เด็กชายผู้ย้อนเวลาได้ 8 วินาที",
+        "cat": "ลึกลับ ตำนาน ปาฏิหาริย์ คำสาป และพลังเหนือธรรมชาติ",
+        "file": "Generator 6"
+    },
+    {
+        "id": "Series4",
+        "title": "กระจกโบราณที่เผยความจริง",
+        "cat": "ลึกลับ ตำนาน ปาฏิหาริย์ คำสาป และพลังเหนือธรรมชาติ",
+        "file": "Generator 6"
+    },
+    {
+        "id": "Series5",
+        "title": "หมอดูที่เห็นอนาคตของตัวเอง",
+        "cat": "ลึกลับ ตำนาน ปาฏิหาริย์ คำสาป และพลังเหนือธรรมชาติ",
+        "file": "Generator 6"
+    },
+    {
+        "id": "Series6",
+        "title": "เสียงกระซิบจากต้นไทรร้อยปี",
+        "cat": "ลึกลับ ตำนาน ปาฏิหาริย์ คำสาป และพลังเหนือธรรมชาติ",
+        "file": "Generator 6"
+    },
+    {
+        "id": "Series7",
+        "title": "สร้อยพระที่ปกป้องเจ้าของ",
+        "cat": "ลึกลับ ตำนาน ปาฏิหาริย์ คำสาป และพลังเหนือธรรมชาติ",
+        "file": "Generator 6"
+    },
+    {
+        "id": "Series8",
+        "title": "หญิงสาวที่สัมผัสแล้วเห็นอดีต",
+        "cat": "ลึกลับ ตำนาน ปาฏิหาริย์ คำสาป และพลังเหนือธรรมชาติ",
+        "file": "Generator 6"
+    },
+    {
+        "id": "Series9",
+        "title": "คำสาปจากเรือนไทยโบราณ",
+        "cat": "ลึกลับ ตำนาน ปาฏิหาริย์ คำสาป และพลังเหนือธรรมชาติ",
+        "file": "Generator 6"
+    },
+    {
+        "id": "Series10",
+        "title": "พยาบาลกับผู้ป่วยที่ไม่มีตัวตนในทะเบียน",
+        "cat": "ลึกลับ ตำนาน ปาฏิหาริย์ คำสาป และพลังเหนือธรรมชาติ",
+        "file": "Generator 6"
+    },
+    {
+        "id": "Series11",
+        "title": "เด็กส่งของกับกล่องต้องห้าม",
+        "cat": "ลึกลับ ตำนาน ปาฏิหาริย์ คำสาป และพลังเหนือธรรมชาติ",
+        "file": "Generator 6"
+    },
+    {
+        "id": "Series12",
+        "title": "แม่ค้าธรรมดากับลูกค้าที่ไม่ใช่มนุษย์",
+        "cat": "ลึกลับ ตำนาน ปาฏิหาริย์ คำสาป และพลังเหนือธรรมชาติ",
+        "file": "Generator 6"
+    },
+    {
+        "id": "Series13",
+        "title": "ชายหนุ่มผู้หยุดเวลาได้ชั่วคราว",
+        "cat": "ลึกลับ ตำนาน ปาฏิหาริย์ คำสาป และพลังเหนือธรรมชาติ",
+        "file": "Generator 6"
+    },
+    {
+        "id": "Series14",
+        "title": "ภาพถ่ายที่เปลี่ยนชะตาชีวิต",
+        "cat": "ลึกลับ ตำนาน ปาฏิหาริย์ คำสาป และพลังเหนือธรรมชาติ",
+        "file": "Generator 6"
+    },
+    {
+        "id": "Series15",
+        "title": "CEO ที่มีพลังอ่านใจคน",
+        "cat": "ลึกลับ ตำนาน ปาฏิหาริย์ คำสาป และพลังเหนือธรรมชาติ",
+        "file": "Generator 6"
+    },
+    {
+        "id": "Series16",
+        "title": "ครูสาวกับนักเรียนผู้ทำนายอนาคต",
+        "cat": "ลึกลับ ตำนาน ปาฏิหาริย์ คำสาป และพลังเหนือธรรมชาติ",
+        "file": "Generator 6"
+    },
+    {
+        "id": "Series17",
+        "title": "พระเครื่องที่เลือกเจ้าของเอง",
+        "cat": "ลึกลับ ตำนาน ปาฏิหาริย์ คำสาป และพลังเหนือธรรมชาติ",
+        "file": "Generator 6"
+    },
+    {
+        "id": "Series18",
+        "title": "หญิงปริศนาผู้ไม่แก่ไปตามกาลเวลา",
+        "cat": "ลึกลับ ตำนาน ปาฏิหาริย์ คำสาป และพลังเหนือธรรมชาติ",
+        "file": "Generator 6"
+    },
+    {
+        "id": "Series19",
+        "title": "วิญญาณผู้ช่วยเปิดโปงความจริง",
+        "cat": "ลึกลับ ตำนาน ปาฏิหาริย์ คำสาป และพลังเหนือธรรมชาติ",
+        "file": "Generator 6"
+    },
+    {
+        "id": "Series20",
+        "title": "เด็กกำพร้ากับพลังรักษาผู้คน",
+        "cat": "ลึกลับ ตำนาน ปาฏิหาริย์ คำสาป และพลังเหนือธรรมชาติ",
+        "file": "Generator 6"
+    },
+    {
+        "id": "Series21",
+        "title": "ปาฏิหาริย์คืนสุดท้ายก่อนจากลา",
+        "cat": "ลึกลับ ตำนาน ปาฏิหาริย์ คำสาป และพลังเหนือธรรมชาติ",
+        "file": "Generator 6"
+    },
+    {
+        "id": "Series22",
+        "title": "รถแท็กซี่ที่รับผู้โดยสารจากอีกภพ",
+        "cat": "ลึกลับ ตำนาน ปาฏิหาริย์ คำสาป และพลังเหนือธรรมชาติ",
+        "file": "Generator 6"
+    },
+    {
+        "id": "Series23",
+        "title": "แหวนโบราณที่ผูกชะตารัก",
+        "cat": "ลึกลับ ตำนาน ปาฏิหาริย์ คำสาป และพลังเหนือธรรมชาติ",
+        "file": "Generator 6"
+    },
+    {
+        "id": "Series24",
+        "title": "คนธรรมดาที่คุยกับเทวดาได้",
+        "cat": "ลึกลับ ตำนาน ปาฏิหาริย์ คำสาป และพลังเหนือธรรมชาติ",
+        "file": "Generator 6"
+    },
+    {
+        "id": "Series25",
+        "title": "คำอธิษฐานที่เปลี่ยนชีวิตทั้งครอบครัว",
+        "cat": "ลึกลับ ตำนาน ปาฏิหาริย์ คำสาป และพลังเหนือธรรมชาติ",
+        "file": "Generator 6"
+    },
+    {
+        "id": "Series1",
+        "title": "เด็กหญิงผู้ได้ยินเสียงจากตุ๊กตาโบราณ",
+        "cat": "เหนือธรรมชาติ: วิญญาณ ของศักดิ์สิทธิ์ และภพซ่อนเร้น",
+        "file": "Generator 7"
+    },
+    {
+        "id": "Series2",
+        "title": "พระพุทธรูปองค์เล็กที่ทำให้คำอธิษฐานเป็นจริง",
+        "cat": "เหนือธรรมชาติ: วิญญาณ ของศักดิ์สิทธิ์ และภพซ่อนเร้น",
+        "file": "Generator 7"
+    },
+    {
+        "id": "Series3",
+        "title": "หนุ่มนักดนตรีกับบทเพลงเรียกวิญญาณ",
+        "cat": "เหนือธรรมชาติ: วิญญาณ ของศักดิ์สิทธิ์ และภพซ่อนเร้น",
+        "file": "Generator 7"
+    },
+    {
+        "id": "Series4",
+        "title": "หญิงสาวที่หลุดเข้าไปในหมู่บ้านลับแล",
+        "cat": "เหนือธรรมชาติ: วิญญาณ ของศักดิ์สิทธิ์ และภพซ่อนเร้น",
+        "file": "Generator 7"
+    },
+    {
+        "id": "Series5",
+        "title": "สมุดบันทึกที่เขียนอนาคตได้",
+        "cat": "เหนือธรรมชาติ: วิญญาณ ของศักดิ์สิทธิ์ และภพซ่อนเร้น",
+        "file": "Generator 7"
+    },
+    {
+        "id": "Series6",
+        "title": "สาวขายดอกไม้ผู้เห็นเทวดาประจำตัว",
+        "cat": "เหนือธรรมชาติ: วิญญาณ ของศักดิ์สิทธิ์ และภพซ่อนเร้น",
+        "file": "Generator 7"
+    },
+    {
+        "id": "Series7",
+        "title": "กำไลเงินที่ปกป้องจากอาถรรย์",
+        "cat": "เหนือธรรมชาติ: วิญญาณ ของศักดิ์สิทธิ์ และภพซ่อนเร้น",
+        "file": "Generator 7"
+    },
+    {
+        "id": "Series8",
+        "title": "ชายหนุ่มที่มองเห็นเงากรรมของผู้คน",
+        "cat": "เหนือธรรมชาติ: วิญญาณ ของศักดิ์สิทธิ์ และภพซ่อนเร้น",
+        "file": "Generator 7"
+    },
+    {
+        "id": "Series9",
+        "title": "บ่อน้ำศักดิ์สิทธิ์กับความลับใต้ผืนดิน",
+        "cat": "เหนือธรรมชาติ: วิญญาณ ของศักดิ์สิทธิ์ และภพซ่อนเร้น",
+        "file": "Generator 7"
+    },
+    {
+        "id": "Series10",
+        "title": "วิญญาณเด็กที่เฝ้ารอคำสัญญา",
+        "cat": "เหนือธรรมชาติ: วิญญาณ ของศักดิ์สิทธิ์ และภพซ่อนเร้น",
+        "file": "Generator 7"
+    },
+    {
+        "id": "Series11",
+        "title": "นักโบราณคดีกับประตูสู่อีกภพ",
+        "cat": "เหนือธรรมชาติ: วิญญาณ ของศักดิ์สิทธิ์ และภพซ่อนเร้น",
+        "file": "Generator 7"
+    },
+    {
+        "id": "Series12",
+        "title": "หญิงสาวผู้พูดคุยกับสัตว์ได้",
+        "cat": "เหนือธรรมชาติ: วิญญาณ ของศักดิ์สิทธิ์ และภพซ่อนเร้น",
+        "file": "Generator 7"
+    },
+    {
+        "id": "Series13",
+        "title": "แผนที่โบราณที่พาไปสู่เมืองต้องห้าม",
+        "cat": "เหนือธรรมชาติ: วิญญาณ ของศักดิ์สิทธิ์ และภพซ่อนเร้น",
+        "file": "Generator 7"
+    },
+    {
+        "id": "Series14",
+        "title": "คนสวนกับต้นไม้ที่ตอบคำถามได้",
+        "cat": "เหนือธรรมชาติ: วิญญาณ ของศักดิ์สิทธิ์ และภพซ่อนเร้น",
+        "file": "Generator 7"
+    },
+    {
+        "id": "Series15",
+        "title": "แหวนหยกที่เผยชาติภพก่อน",
+        "cat": "เหนือธรรมชาติ: วิญญาณ ของศักดิ์สิทธิ์ และภพซ่อนเร้น",
+        "file": "Generator 7"
+    },
+    {
+        "id": "Series16",
+        "title": "หมอหนุ่มกับคนไข้ที่หายตัวทุกคืน",
+        "cat": "เหนือธรรมชาติ: วิญญาณ ของศักดิ์สิทธิ์ และภพซ่อนเร้น",
+        "file": "Generator 7"
+    },
+    {
+        "id": "Series17",
+        "title": "ดวงตาที่มองเห็นภูตผี",
+        "cat": "เหนือธรรมชาติ: วิญญาณ ของศักดิ์สิทธิ์ และภพซ่อนเร้น",
+        "file": "Generator 7"
+    },
+    {
+        "id": "Series18",
+        "title": "ร้านของเก่าที่เปิดเฉพาะคืนเดือนเพ็ญ",
+        "cat": "เหนือธรรมชาติ: วิญญาณ ของศักดิ์สิทธิ์ และภพซ่อนเร้น",
+        "file": "Generator 7"
+    },
+    {
+        "id": "Series19",
+        "title": "ชายผู้ได้รับพรให้รู้ความจริง",
+        "cat": "เหนือธรรมชาติ: วิญญาณ ของศักดิ์สิทธิ์ และภพซ่อนเร้น",
+        "file": "Generator 7"
+    },
+    {
+        "id": "Series20",
+        "title": "ผ้าคลุมโบราณที่ซ่อนพลังศักดิ์สิทธิ์",
+        "cat": "เหนือธรรมชาติ: วิญญาณ ของศักดิ์สิทธิ์ และภพซ่อนเร้น",
+        "file": "Generator 7"
+    },
+    {
+        "id": "Series21",
+        "title": "เด็กกำพร้ากับผู้พิทักษ์จากอีกโลก",
+        "cat": "เหนือธรรมชาติ: วิญญาณ ของศักดิ์สิทธิ์ และภพซ่อนเร้น",
+        "file": "Generator 7"
+    },
+    {
+        "id": "Series22",
+        "title": "นาฬิกาที่หยุดเมื่อความตายมาเยือน",
+        "cat": "เหนือธรรมชาติ: วิญญาณ ของศักดิ์สิทธิ์ และภพซ่อนเร้น",
+        "file": "Generator 7"
+    },
+    {
+        "id": "Series23",
+        "title": "หญิงสาวกับคำสาปเจ็ดชั่วอายุคน",
+        "cat": "เหนือธรรมชาติ: วิญญาณ ของศักดิ์สิทธิ์ และภพซ่อนเร้น",
+        "file": "Generator 7"
+    },
+    {
+        "id": "Series24",
+        "title": "ผู้เฒ่าผู้รักษาประตูวิญญาณ",
+        "cat": "เหนือธรรมชาติ: วิญญาณ ของศักดิ์สิทธิ์ และภพซ่อนเร้น",
+        "file": "Generator 7"
+    },
+    {
+        "id": "Series25",
+        "title": "ดาวตกคืนเดียวที่เปลี่ยนโชคชะตา",
+        "cat": "เหนือธรรมชาติ: วิญญาณ ของศักดิ์สิทธิ์ และภพซ่อนเร้น",
+        "file": "Generator 7"
+    },
+    {
+        "id": "Series1",
+        "title": "แม่ค้าก๋วยเตี๋ยวผู้รักษาคนด้วยการสัมผัส",
+        "cat": "เหนือธรรมชาติ: ปาฏิหาริย์ กรรม และพรสวรรค์พิเศษ",
+        "file": "Generator 8"
+    },
+    {
+        "id": "Series2",
+        "title": "เด็กชายที่ฝันเห็นเหตุการณ์ล่วงหน้า",
+        "cat": "เหนือธรรมชาติ: ปาฏิหาริย์ กรรม และพรสวรรค์พิเศษ",
+        "file": "Generator 8"
+    },
+    {
+        "id": "Series3",
+        "title": "หญิงสาวผู้ลบความทรงจำเจ็บปวดได้",
+        "cat": "เหนือธรรมชาติ: ปาฏิหาริย์ กรรม และพรสวรรค์พิเศษ",
+        "file": "Generator 8"
+    },
+    {
+        "id": "Series4",
+        "title": "ชายหนุ่มที่รับโชคร้ายแทนคนรัก",
+        "cat": "เหนือธรรมชาติ: ปาฏิหาริย์ กรรม และพรสวรรค์พิเศษ",
+        "file": "Generator 8"
+    },
+    {
+        "id": "Series5",
+        "title": "คำอธิษฐานหน้าศาลเจ้าที่เป็นจริง",
+        "cat": "เหนือธรรมชาติ: ปาฏิหาริย์ กรรม และพรสวรรค์พิเศษ",
+        "file": "Generator 8"
+    },
+    {
+        "id": "Series6",
+        "title": "นักเรียนสาวที่คุยกับวิญญาณบรรพบุรุษ",
+        "cat": "เหนือธรรมชาติ: ปาฏิหาริย์ กรรม และพรสวรรค์พิเศษ",
+        "file": "Generator 8"
+    },
+    {
+        "id": "Series7",
+        "title": "เหรียญโบราณที่เรียกปาฏิหาริย์",
+        "cat": "เหนือธรรมชาติ: ปาฏิหาริย์ กรรม และพรสวรรค์พิเศษ",
+        "file": "Generator 8"
+    },
+    {
+        "id": "Series8",
+        "title": "คุณหมอผู้หยุดหัวใจคนตายได้ชั่วคราว",
+        "cat": "เหนือธรรมชาติ: ปาฏิหาริย์ กรรม และพรสวรรค์พิเศษ",
+        "file": "Generator 8"
+    },
+    {
+        "id": "Series9",
+        "title": "หนุ่มไรเดอร์กับพรสามข้อ",
+        "cat": "เหนือธรรมชาติ: ปาฏิหาริย์ กรรม และพรสวรรค์พิเศษ",
+        "file": "Generator 8"
+    },
+    {
+        "id": "Series10",
+        "title": "หญิงสาวที่เห็นเส้นด้ายแห่งโชคชะตา",
+        "cat": "เหนือธรรมชาติ: ปาฏิหาริย์ กรรม และพรสวรรค์พิเศษ",
+        "file": "Generator 8"
+    },
+    {
+        "id": "Series11",
+        "title": "ครูผู้แบ่งปันความฝันให้ศิษย์",
+        "cat": "เหนือธรรมชาติ: ปาฏิหาริย์ กรรม และพรสวรรค์พิเศษ",
+        "file": "Generator 8"
+    },
+    {
+        "id": "Series12",
+        "title": "คนเก็บขยะกับสมบัติจากสวรรค์",
+        "cat": "เหนือธรรมชาติ: ปาฏิหาริย์ กรรม และพรสวรรค์พิเศษ",
+        "file": "Generator 8"
+    },
+    {
+        "id": "Series13",
+        "title": "เด็กหญิงที่เปลี่ยนน้ำตาเป็นอัญมณี",
+        "cat": "เหนือธรรมชาติ: ปาฏิหาริย์ กรรม และพรสวรรค์พิเศษ",
+        "file": "Generator 8"
+    },
+    {
+        "id": "Series14",
+        "title": "ชายผู้ได้ยินเสียงกรรมของตนเอง",
+        "cat": "เหนือธรรมชาติ: ปาฏิหาริย์ กรรม และพรสวรรค์พิเศษ",
+        "file": "Generator 8"
+    },
+    {
+        "id": "Series15",
+        "title": "เทียนศักดิ์สิทธิ์ที่เปิดเผยความจริง",
+        "cat": "เหนือธรรมชาติ: ปาฏิหาริย์ กรรม และพรสวรรค์พิเศษ",
+        "file": "Generator 8"
+    },
+    {
+        "id": "Series16",
+        "title": "นักร้องสาวกับเสียงที่ปลุกวิญญาณ",
+        "cat": "เหนือธรรมชาติ: ปาฏิหาริย์ กรรม และพรสวรรค์พิเศษ",
+        "file": "Generator 8"
+    },
+    {
+        "id": "Series17",
+        "title": "พนักงานธนาคารผู้มองเห็นบุญวาสนา",
+        "cat": "เหนือธรรมชาติ: ปาฏิหาริย์ กรรม และพรสวรรค์พิเศษ",
+        "file": "Generator 8"
+    },
+    {
+        "id": "Series18",
+        "title": "หญิงชราผู้ส่งข้อความจากคนบนฟ้า",
+        "cat": "เหนือธรรมชาติ: ปาฏิหาริย์ กรรม และพรสวรรค์พิเศษ",
+        "file": "Generator 8"
+    },
+    {
+        "id": "Series19",
+        "title": "คนขับรถเมล์กับผู้โดยสารที่เป็นเทพ",
+        "cat": "เหนือธรรมชาติ: ปาฏิหาริย์ กรรม และพรสวรรค์พิเศษ",
+        "file": "Generator 8"
+    },
+    {
+        "id": "Series20",
+        "title": "สมุดภาพที่เปลี่ยนความจริง",
+        "cat": "เหนือธรรมชาติ: ปาฏิหาริย์ กรรม และพรสวรรค์พิเศษ",
+        "file": "Generator 8"
+    },
+    {
+        "id": "Series21",
+        "title": "เด็กกำพร้าที่ได้รับพรจากพระจันทร์",
+        "cat": "เหนือธรรมชาติ: ปาฏิหาริย์ กรรม และพรสวรรค์พิเศษ",
+        "file": "Generator 8"
+    },
+    {
+        "id": "Series22",
+        "title": "ชายหนุ่มผู้ย้อนโชคชะตาได้หนึ่งครั้ง",
+        "cat": "เหนือธรรมชาติ: ปาฏิหาริย์ กรรม และพรสวรรค์พิเศษ",
+        "file": "Generator 8"
+    },
+    {
+        "id": "Series23",
+        "title": "เจ้าของร้านขนมที่เติมเต็มคำขอสุดท้าย",
+        "cat": "เหนือธรรมชาติ: ปาฏิหาริย์ กรรม และพรสวรรค์พิเศษ",
+        "file": "Generator 8"
+    },
+    {
+        "id": "Series24",
+        "title": "หญิงสาวที่คืนชีวิตให้ดอกไม้แห้ง",
+        "cat": "เหนือธรรมชาติ: ปาฏิหาริย์ กรรม และพรสวรรค์พิเศษ",
+        "file": "Generator 8"
+    },
+    {
+        "id": "Series25",
+        "title": "ดาวประจำตัวที่ไม่เคยดับ",
+        "cat": "เหนือธรรมชาติ: ปาฏิหาริย์ กรรม และพรสวรรค์พิเศษ",
+        "file": "Generator 8"
+    },
+    {
+        "id": "Series1",
+        "title": "รักต้องห้ามในยุครัตนโกสินทร์",
+        "cat": "ย้อนยุค พีเรียด และชะตาข้ามเวลา",
+        "file": "Generator 9"
+    },
+    {
+        "id": "Series2",
+        "title": "สาวยุคปัจจุบันย้อนสู่อดีต",
+        "cat": "ย้อนยุค พีเรียด และชะตาข้ามเวลา",
+        "file": "Generator 9"
+    },
+    {
+        "id": "Series3",
+        "title": "บันทึกลับของขุนนางหนุ่ม",
+        "cat": "ย้อนยุค พีเรียด และชะตาข้ามเวลา",
+        "file": "Generator 9"
+    },
+    {
+        "id": "Series4",
+        "title": "เจ้าหญิงผู้ถูกลืม",
+        "cat": "ย้อนยุค พีเรียด และชะตาข้ามเวลา",
+        "file": "Generator 9"
+    },
+    {
+        "id": "Series5",
+        "title": "คำสาบานใต้ต้นโพธิ์",
+        "cat": "ย้อนยุค พีเรียด และชะตาข้ามเวลา",
+        "file": "Generator 9"
+    },
+    {
+        "id": "Series6",
+        "title": "ทหารหนุ่มกับหญิงชาววัง",
+        "cat": "ย้อนยุค พีเรียด และชะตาข้ามเวลา",
+        "file": "Generator 9"
+    },
+    {
+        "id": "Series7",
+        "title": "ผ้าไหมผืนสุดท้าย",
+        "cat": "ย้อนยุค พีเรียด และชะตาข้ามเวลา",
+        "file": "Generator 9"
+    },
+    {
+        "id": "Series8",
+        "title": "ความรักข้ามภพสองแผ่นดิน",
+        "cat": "ย้อนยุค พีเรียด และชะตาข้ามเวลา",
+        "file": "Generator 9"
+    },
+    {
+        "id": "Series9",
+        "title": "ทายาทตระกูลเก่ากับความลับในเรือน",
+        "cat": "ย้อนยุค พีเรียด และชะตาข้ามเวลา",
+        "file": "Generator 9"
+    },
+    {
+        "id": "Series10",
+        "title": "จดหมายรักจากอดีต",
+        "cat": "ย้อนยุค พีเรียด และชะตาข้ามเวลา",
+        "file": "Generator 9"
+    },
+    {
+        "id": "Series11",
+        "title": "หญิงสาวผู้สืบสายเลือดราชสกุล",
+        "cat": "ย้อนยุค พีเรียด และชะตาข้ามเวลา",
+        "file": "Generator 9"
+    },
+    {
+        "id": "Series12",
+        "title": "ชายหนุ่มกับนาฬิกาที่พาไปอีกยุค",
+        "cat": "ย้อนยุค พีเรียด และชะตาข้ามเวลา",
+        "file": "Generator 9"
+    },
+    {
+        "id": "Series13",
+        "title": "ความทรงจำของชาติที่ไม่เคยถูกเล่า",
+        "cat": "ย้อนยุค พีเรียด และชะตาข้ามเวลา",
+        "file": "Generator 9"
+    },
+    {
+        "id": "Series14",
+        "title": "คู่รักที่พบกันทุกชาติภพ",
+        "cat": "ย้อนยุค พีเรียด และชะตาข้ามเวลา",
+        "file": "Generator 9"
+    },
+    {
+        "id": "Series15",
+        "title": "ศิลปินผู้วาดภาพอนาคต",
+        "cat": "ย้อนยุค พีเรียด และชะตาข้ามเวลา",
+        "file": "Generator 9"
+    },
+    {
+        "id": "Series16",
+        "title": "สงครามพรากรัก",
+        "cat": "ย้อนยุค พีเรียด และชะตาข้ามเวลา",
+        "file": "Generator 9"
+    },
+    {
+        "id": "Series17",
+        "title": "เรือนไทยกับคำสัญญาโบราณ",
+        "cat": "ย้อนยุค พีเรียด และชะตาข้ามเวลา",
+        "file": "Generator 9"
+    },
+    {
+        "id": "Series18",
+        "title": "แหวนหมั้นข้ามเวลา",
+        "cat": "ย้อนยุค พีเรียด และชะตาข้ามเวลา",
+        "file": "Generator 9"
+    },
+    {
+        "id": "Series19",
+        "title": "ลูกหลานผู้ต้องแก้กรรมบรรพบุรุษ",
+        "cat": "ย้อนยุค พีเรียด และชะตาข้ามเวลา",
+        "file": "Generator 9"
+    },
+    {
+        "id": "Series20",
+        "title": "ราชเลขากับความลับในวัง",
+        "cat": "ย้อนยุค พีเรียด และชะตาข้ามเวลา",
+        "file": "Generator 9"
+    },
+    {
+        "id": "Series21",
+        "title": "หญิงสาวผู้ได้ยินเสียงจากอดีต",
+        "cat": "ย้อนยุค พีเรียด และชะตาข้ามเวลา",
+        "file": "Generator 9"
+    },
+    {
+        "id": "Series22",
+        "title": "คำทำนายแห่งราชวงศ์",
+        "cat": "ย้อนยุค พีเรียด และชะตาข้ามเวลา",
+        "file": "Generator 9"
+    },
+    {
+        "id": "Series23",
+        "title": "ความรักที่รอคอยร้อยปี",
+        "cat": "ย้อนยุค พีเรียด และชะตาข้ามเวลา",
+        "file": "Generator 9"
+    },
+    {
+        "id": "Series24",
+        "title": "ตำราโบราณเปลี่ยนชะตา",
+        "cat": "ย้อนยุค พีเรียด และชะตาข้ามเวลา",
+        "file": "Generator 9"
+    },
+    {
+        "id": "Series25",
+        "title": "โชคชะตาที่ผูกพันมาตั้งแต่ชาติปางก่อน",
+        "cat": "ย้อนยุค พีเรียด และชะตาข้ามเวลา",
+        "file": "Generator 9"
+    },
+    {
+        "id": "Series1",
+        "title": "นักสืบสาวกับคดีปริศนาที่ไม่มีศพ",
+        "cat": "อาชญากรรม สืบสวน และระทึกขวัญ",
+        "file": "Generator 10"
+    },
+    {
+        "id": "Series2",
+        "title": "ทนายหนุ่มผู้ปกป้องฆาตกร",
+        "cat": "อาชญากรรม สืบสวน และระทึกขวัญ",
+        "file": "Generator 10"
+    },
+    {
+        "id": "Series3",
+        "title": "ภรรยาที่หายไปในคืนฝนตก",
+        "cat": "อาชญากรรม สืบสวน และระทึกขวัญ",
+        "file": "Generator 10"
+    },
+    {
+        "id": "Series4",
+        "title": "พยานคนสุดท้ายที่จำอะไรไม่ได้",
+        "cat": "อาชญากรรม สืบสวน และระทึกขวัญ",
+        "file": "Generator 10"
+    },
+    {
+        "id": "Series5",
+        "title": "ตำรวจใหม่กับคดีฆาตกรรมต่อเนื่อง",
+        "cat": "อาชญากรรม สืบสวน และระทึกขวัญ",
+        "file": "Generator 10"
+    },
+    {
+        "id": "Series6",
+        "title": "นักข่าวสาวเปิดโปงองค์กรลับ",
+        "cat": "อาชญากรรม สืบสวน และระทึกขวัญ",
+        "file": "Generator 10"
+    },
+    {
+        "id": "Series7",
+        "title": "หมอผู้รู้ว่าใครคือฆาตกร",
+        "cat": "อาชญากรรม สืบสวน และระทึกขวัญ",
+        "file": "Generator 10"
+    },
+    {
+        "id": "Series8",
+        "title": "เด็กชายที่เห็นเหตุการณ์แต่พูดไม่ได้",
+        "cat": "อาชญากรรม สืบสวน และระทึกขวัญ",
+        "file": "Generator 10"
+    },
+    {
+        "id": "Series9",
+        "title": "แฮกเกอร์ปริศนาที่ช่วยตำรวจ",
+        "cat": "อาชญากรรม สืบสวน และระทึกขวัญ",
+        "file": "Generator 10"
+    },
+    {
+        "id": "Series10",
+        "title": "ครอบครัวสมบูรณ์แบบที่ซ่อนความลับ",
+        "cat": "อาชญากรรม สืบสวน และระทึกขวัญ",
+        "file": "Generator 10"
+    },
+    {
+        "id": "Series11",
+        "title": "ผู้พิพากษากับคำตัดสินที่เปลี่ยนชีวิต",
+        "cat": "อาชญากรรม สืบสวน และระทึกขวัญ",
+        "file": "Generator 10"
+    },
+    {
+        "id": "Series12",
+        "title": "นักจิตวิทยากับคนไข้ฆาตกร",
+        "cat": "อาชญากรรม สืบสวน และระทึกขวัญ",
+        "file": "Generator 10"
+    },
+    {
+        "id": "Series13",
+        "title": "เพื่อนสนิทที่อาจเป็นคนร้าย",
+        "cat": "อาชญากรรม สืบสวน และระทึกขวัญ",
+        "file": "Generator 10"
+    },
+    {
+        "id": "Series14",
+        "title": "ศพในโรงแรมหรู",
+        "cat": "อาชญากรรม สืบสวน และระทึกขวัญ",
+        "file": "Generator 10"
+    },
+    {
+        "id": "Series15",
+        "title": "CEO ผู้ถูกแบล็กเมล์",
+        "cat": "อาชญากรรม สืบสวน และระทึกขวัญ",
+        "file": "Generator 10"
+    },
+    {
+        "id": "Series16",
+        "title": "คดีลักพาตัวที่โยงถึงอดีต",
+        "cat": "อาชญากรรม สืบสวน และระทึกขวัญ",
+        "file": "Generator 10"
+    },
+    {
+        "id": "Series17",
+        "title": "นักสืบเอกชนกับรูปถ่ายใบสุดท้าย",
+        "cat": "อาชญากรรม สืบสวน และระทึกขวัญ",
+        "file": "Generator 10"
+    },
+    {
+        "id": "Series18",
+        "title": "คนขับแท็กซี่ผู้รู้ความจริง",
+        "cat": "อาชญากรรม สืบสวน และระทึกขวัญ",
+        "file": "Generator 10"
+    },
+    {
+        "id": "Series19",
+        "title": "เด็กฝึกงานในบริษัทสีเทา",
+        "cat": "อาชญากรรม สืบสวน และระทึกขวัญ",
+        "file": "Generator 10"
+    },
+    {
+        "id": "Series20",
+        "title": "ฆาตกรที่ทิ้งข้อความถึงเหยื่อ",
+        "cat": "อาชญากรรม สืบสวน และระทึกขวัญ",
+        "file": "Generator 10"
+    },
+    {
+        "id": "Series21",
+        "title": "การหายตัวไปของเจ้าสาว",
+        "cat": "อาชญากรรม สืบสวน และระทึกขวัญ",
+        "file": "Generator 10"
+    },
+    {
+        "id": "Series22",
+        "title": "ความทรงจำที่ถูกสร้างขึ้น",
+        "cat": "อาชญากรรม สืบสวน และระทึกขวัญ",
+        "file": "Generator 10"
+    },
+    {
+        "id": "Series23",
+        "title": "พี่น้องสองคนกับคดีเดียวกัน",
+        "cat": "อาชญากรรม สืบสวน และระทึกขวัญ",
+        "file": "Generator 10"
+    },
+    {
+        "id": "Series24",
+        "title": "นักโทษผู้ยืนยันว่าตนบริสุทธิ์",
+        "cat": "อาชญากรรม สืบสวน และระทึกขวัญ",
+        "file": "Generator 10"
+    },
+    {
+        "id": "Series25",
+        "title": "คืนที่ทุกคนโกหก",
+        "cat": "อาชญากรรม สืบสวน และระทึกขวัญ",
+        "file": "Generator 10"
+    }
+];
+
+        const container = document.getElementById('series-container');
+        const searchInput = document.getElementById('search-input');
+        const fileFiltersContainer = document.getElementById('file-filters');
+        const catFiltersContainer = document.getElementById('category-filters');
+        const noResults = document.getElementById('no-results');
+        const totalCountDisplay = document.getElementById('total-count');
+        const catCountDisplay = document.getElementById('cat-count');
+
+        // Extract unique filters
+        const files = [...new Set(seriesData.map(item => item.file))].sort((a,b) => {
+            const numA = parseInt(a.replace('Generator ', ''));
+            const numB = parseInt(b.replace('Generator ', ''));
+            return numA - numB;
+        });
+        const categories = [...new Set(seriesData.map(item => item.cat))].sort();
+        
+        catCountDisplay.textContent = categories.length;
+
+        // Build filter buttons
+        files.forEach(f => {
+            const btn = document.createElement('button');
+            btn.className = 'pill-filter';
+            btn.setAttribute('data-file', f);
+            btn.textContent = f.replace('Generator ', 'Gen ');
+            fileFiltersContainer.appendChild(btn);
+        });
+
+        categories.forEach(c => {
+            const btn = document.createElement('button');
+            btn.className = 'pill-filter';
+            btn.setAttribute('data-cat', c);
+            btn.textContent = c;
+            catFiltersContainer.appendChild(btn);
+        });
+
+        let activeFile = 'all';
+        let activeCat = 'all';
+        let searchTerm = '';
+
+        function renderCards() {
+            const filtered = seriesData.filter(item => {
+                const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                    item.id.toLowerCase().includes(searchTerm.toLowerCase());
+                const matchesFile = activeFile === 'all' || item.file === activeFile;
+                const matchesCat = activeCat === 'all' || item.cat === activeCat;
+                return matchesSearch && matchesFile && matchesCat;
+            });
+
+            container.querySelectorAll('.category-section').forEach(el => el.remove());
+            
+            if (filtered.length === 0) {
+                noResults.style.display = 'block';
+            } else {
+                noResults.style.display = 'none';
+                
+                const grouped = {};
+                filtered.forEach(item => {
+                    if (!grouped[item.cat]) grouped[item.cat] = [];
+                    grouped[item.cat].push(item);
+                });
+                
+                Object.keys(grouped).sort().forEach(cat => {
+                    const section = document.createElement('div');
+                    section.className = 'category-section';
+                    
+                    const header = document.createElement('h3');
+                    header.className = 'category-heading';
+                    header.innerHTML = `${cat} <span class="cat-count-badge">${grouped[cat].length}</span>`;
+                    
+                    const grid = document.createElement('div');
+                    grid.className = 'series-grid';
+                    
+                    header.addEventListener('click', () => {
+                        header.classList.toggle('collapsed');
+                        grid.classList.toggle('collapsed');
+                    });
+                    
+                    grouped[cat].forEach(item => {
+                        const card = document.createElement('div');
+                        card.className = 'card';
+                        card.innerHTML = `
+                            <div class="card-header">
+                                <span class="series-id">${item.id}</span>
+                                <span class="source-tag">${item.file.replace('Generator ', 'Gen ')}</span>
+                            </div>
+                            <div class="title">${item.title}</div>
+                        `;
+                        grid.appendChild(card);
+                    });
+                    
+                    section.appendChild(header);
+                    section.appendChild(grid);
+                    container.insertBefore(section, noResults);
+                });
+            }
+            totalCountDisplay.textContent = filtered.length;
+        }
+
+        // Event listeners
+        searchInput.addEventListener('input', (e) => {
+            searchTerm = e.target.value;
+            renderCards();
+        });
+
+        fileFiltersContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('pill-filter')) {
+                fileFiltersContainer.querySelectorAll('.pill-filter').forEach(p => p.classList.remove('active'));
+                e.target.classList.add('active');
+                activeFile = e.target.getAttribute('data-file');
+                renderCards();
+            }
+        });
+
+        catFiltersContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('pill-filter')) {
+                catFiltersContainer.querySelectorAll('.pill-filter').forEach(p => p.classList.remove('active'));
+                e.target.classList.add('active');
+                activeCat = e.target.getAttribute('data-cat');
+                renderCards();
+            }
+        });
+
+        renderCards();
+    </script>
+</body>
+</html>
