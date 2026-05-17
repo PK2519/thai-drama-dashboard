@@ -35,6 +35,8 @@
       --gen8: #EC4899;
       --gen9: #B45309;
       --gen10: #DC2626;
+      --gen11: #0EA5E9;
+      --gen12: #14B8A6;
 
       /* Category colors */
       --cat-romance: #E8516A;
@@ -170,6 +172,8 @@
     .pill[data-gen="8"].active  { background: var(--gen8);  border-color: var(--gen8); }
     .pill[data-gen="9"].active  { background: var(--gen9);  border-color: var(--gen9); }
     .pill[data-gen="10"].active { background: var(--gen10); border-color: var(--gen10); }
+    .pill[data-gen="11"].active { background: var(--gen11); border-color: var(--gen11); }
+    .pill[data-gen="12"].active { background: var(--gen12); border-color: var(--gen12); }
 
     /* ── Main content ── */
     .main-section { padding: 36px 0 80px; }
@@ -210,6 +214,8 @@
     .card[data-gen="8"]  { border-left-color: var(--gen8); }
     .card[data-gen="9"]  { border-left-color: var(--gen9); }
     .card[data-gen="10"] { border-left-color: var(--gen10); }
+    .card[data-gen="11"] { border-left-color: var(--gen11); }
+    .card[data-gen="12"] { border-left-color: var(--gen12); }
 
     .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .series-id { font-size: 11px; font-weight: 700; color: var(--slate); letter-spacing: 0.4px; text-transform: uppercase; }
@@ -229,6 +235,8 @@
     .gen-tag[data-gen="8"]  { background: var(--gen8); }
     .gen-tag[data-gen="9"]  { background: var(--gen9); }
     .gen-tag[data-gen="10"] { background: var(--gen10); }
+    .gen-tag[data-gen="11"] { background: var(--gen11); }
+    .gen-tag[data-gen="12"] { background: var(--gen12); }
 
     .card-title {
       font-family: 'Anuphan', 'Inter', sans-serif;
@@ -296,36 +304,36 @@
   <div class="nav-inner">
     <a class="nav-logo" href="#">Thai Drama <em>Series Explorer</em></a>
     <div class="nav-right">
-      <span class="nav-pill" id="nav-total">250 Series</span>
-      <span class="nav-pill">10 Generators</span>
+      <span class="nav-pill" id="nav-total">300 Series</span>
+      <span class="nav-pill">12 Generators</span>
     </div>
   </div>
 </nav>
 
 <!-- ── Hero ── -->
 <section class="hero-dark">
-  <div class="hero-eyebrow">Series Mapping Dashboard — v3.0</div>
+  <div class="hero-eyebrow">Series Mapping Dashboard — v3.2</div>
   <h1 class="hero-heading">Thai Drama Series Explorer</h1>
-  <p class="hero-sub">คลังเนื้อเรื่อง Mini-Series 250 เรื่องจาก 10 Generator สำหรับ Content Creators</p>
+  <p class="hero-sub">คลังเนื้อเรื่อง Mini-Series 300 เรื่องจาก 12 Generator สำหรับ Content Creators</p>
 </section>
 
 <!-- ── Stats strip ── -->
 <div class="stats-blue">
   <div class="stats-inner">
     <div class="stat-item">
-      <div class="stat-number" id="stat-shown">250</div>
+      <div class="stat-number" id="stat-shown">300</div>
       <div class="stat-label">Series ที่แสดง</div>
     </div>
     <div class="stat-item">
-      <div class="stat-number">8</div>
+      <div class="stat-number">9</div>
       <div class="stat-label">Categories</div>
     </div>
     <div class="stat-item">
-      <div class="stat-number">10</div>
+      <div class="stat-number">12</div>
       <div class="stat-label">Source Generators</div>
     </div>
     <div class="stat-item">
-      <div class="stat-number">250</div>
+      <div class="stat-number">300</div>
       <div class="stat-label">Total Stories</div>
     </div>
   </div>
@@ -339,7 +347,7 @@
         <svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         <input class="search-input" type="text" id="search-input" placeholder="ค้นหาชื่อเรื่อง หรือ Series ID..." autocomplete="off" />
       </div>
-      <div class="result-count">แสดง <strong id="result-num">250</strong> จาก 250 เรื่อง</div>
+      <div class="result-count">แสดง <strong id="result-num">300</strong> จาก 300 เรื่อง</div>
     </div>
 
     <div class="filter-row">
@@ -354,6 +362,7 @@
         <button class="pill" data-cat="ลึกลับ & เหนือธรรมชาติ">ลึกลับ &amp; เหนือธรรมชาติ</button>
         <button class="pill" data-cat="ย้อนยุค">ย้อนยุค</button>
         <button class="pill" data-cat="อาชญากรรม & ระทึกขวัญ">อาชญากรรม &amp; ระทึกขวัญ</button>
+        <button class="pill" data-cat="ละครคุณธรรม">ละครคุณธรรม</button>
       </div>
     </div>
 
@@ -371,6 +380,8 @@
         <button class="pill" data-gen="8">Gen 8</button>
         <button class="pill" data-gen="9">Gen 9</button>
         <button class="pill" data-gen="10">Gen 10</button>
+        <button class="pill" data-gen="11">Gen 11</button>
+        <button class="pill" data-gen="12">Gen 12</button>
       </div>
     </div>
   </div>
@@ -392,6 +403,8 @@
       <div class="legend-item"><div class="legend-dot" style="background:var(--gen8)"></div> Gen 8 · ปาฏิหาริย์ &amp; กรรม</div>
       <div class="legend-item"><div class="legend-dot" style="background:var(--gen9)"></div> Gen 9 · ย้อนยุค / ประวัติศาสตร์</div>
       <div class="legend-item"><div class="legend-dot" style="background:var(--gen10)"></div> Gen 10 · อาชญากรรม &amp; ระทึกขวัญ</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--gen11)"></div> Gen 11 · ละครคุณธรรม (ชุด A)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--gen12)"></div> Gen 12 · ละครคุณธรรม (ชุด B)</div>
     </div>
 
     <div class="series-grid" id="series-container">
@@ -408,9 +421,9 @@
   <div class="footer-inner">
     <div>
       <div class="footer-brand">Thai Drama <em>Series Explorer</em></div>
-      <p class="footer-brand-desc">คลังเนื้อเรื่อง Mini-Series 250 เรื่อง ครอบคลุม 10 Generator สำหรับ Content Creators บน TikTok · YouTube Shorts · Facebook Reels</p>
+      <p class="footer-brand-desc">คลังเนื้อเรื่อง Mini-Series 300 เรื่อง ครอบคลุม 12 Generator สำหรับ Content Creators บน TikTok · YouTube Shorts · Facebook Reels</p>
     </div>
-    <div class="footer-copy">Series Mapping Dashboard v3.0 · 10 Generators · 250 Stories</div>
+    <div class="footer-copy">Series Mapping Dashboard v3.2 · 12 Generators · 300 Stories</div>
   </div>
 </footer>
 
@@ -705,6 +718,64 @@ const seriesData = [
   { id:"G10·S23", title:"พี่น้องสองคนกับคดีเดียวกัน",                 cat:"อาชญากรรม & ระทึกขวัญ",  gen:"10" },
   { id:"G10·S24", title:"นักโทษผู้ยืนยันว่าตนบริสุทธิ์",              cat:"อาชญากรรม & ระทึกขวัญ",  gen:"10" },
   { id:"G10·S25", title:"คืนที่ทุกคนโกหก",                            cat:"อาชญากรรม & ระทึกขวัญ",  gen:"10" },
+
+  // ═══════════════════════════════════════
+  // GENERATOR 11 — Moral Drama / ละครคุณธรรม (ชุด A)
+  // ═══════════════════════════════════════
+  { id:"G11·S1",  title:"ลูกสะใภ้ผู้ถูกดูถูกจนพิสูจน์คุณค่าตัวเอง",    cat:"ละครคุณธรรม", gen:"11" },
+  { id:"G11·S2",  title:"พ่อค้าซื่อสัตย์กับโชคที่ไม่คาดคิด",             cat:"ละครคุณธรรม", gen:"11" },
+  { id:"G11·S3",  title:"ลูกชายอกตัญญูที่ได้รับบทเรียนชีวิต",            cat:"ละครคุณธรรม", gen:"11" },
+  { id:"G11·S4",  title:"คนรวยใจดำกับวันที่ไม่เหลือใคร",                 cat:"ละครคุณธรรม", gen:"11" },
+  { id:"G11·S5",  title:"แม่บ้านธรรมดาที่ช่วยชีวิตเจ้าของบริษัท",         cat:"ละครคุณธรรม", gen:"11" },
+  { id:"G11·S6",  title:"พี่สาวเสียสละเพื่อให้น้องได้เรียน",              cat:"ละครคุณธรรม", gen:"11" },
+  { id:"G11·S7",  title:"หญิงสาวที่ถูกใส่ร้ายแต่ความจริงเปิดเผย",         cat:"ละครคุณธรรม", gen:"11" },
+  { id:"G11·S8",  title:"เศรษฐีปลอมตัวเพื่อทดสอบน้ำใจคน",                cat:"ละครคุณธรรม", gen:"11" },
+  { id:"G11·S9",  title:"เด็กเก็บขยะกับโอกาสเปลี่ยนชีวิต",               cat:"ละครคุณธรรม", gen:"11" },
+  { id:"G11·S10", title:"ภรรยาผู้ซื่อสัตย์กับสามีที่หลงผิด",              cat:"ละครคุณธรรม", gen:"11" },
+  { id:"G11·S11", title:"พนักงานดีเด่นที่ไม่มีใครเห็นค่า",                cat:"ละครคุณธรรม", gen:"11" },
+  { id:"G11·S12", title:"เพื่อนแท้ในวันที่หมดตัว",                        cat:"ละครคุณธรรม", gen:"11" },
+  { id:"G11·S13", title:"คนขับแท็กซี่ผู้ไม่เคยเอาเปรียบใคร",              cat:"ละครคุณธรรม", gen:"11" },
+  { id:"G11·S14", title:"ลูกสาวที่กลับมาดูแลแม่ป่วย",                     cat:"ละครคุณธรรม", gen:"11" },
+  { id:"G11·S15", title:"CEO ผู้เรียนรู้คุณค่าของความกตัญญู",              cat:"ละครคุณธรรม", gen:"11" },
+  { id:"G11·S16", title:"พ่อเลี้ยงเดี่ยวที่ยอมทำทุกอย่างเพื่อลูก",        cat:"ละครคุณธรรม", gen:"11" },
+  { id:"G11·S17", title:"ครูผู้เปลี่ยนเด็กเกเรให้มีอนาคต",                cat:"ละครคุณธรรม", gen:"11" },
+  { id:"G11·S18", title:"หญิงชราผู้ถูกทอดทิ้งแต่ได้รับความรักคืน",        cat:"ละครคุณธรรม", gen:"11" },
+  { id:"G11·S19", title:"ลูกจ้างซื่อสัตย์กับเงินที่ไม่ใช่ของตน",          cat:"ละครคุณธรรม", gen:"11" },
+  { id:"G11·S20", title:"นักธุรกิจที่ได้รับผลกรรมจากการโกง",               cat:"ละครคุณธรรม", gen:"11" },
+  { id:"G11·S21", title:"แม่ค้าข้างทางกับลูกค้าที่เปลี่ยนชีวิตเธอ",       cat:"ละครคุณธรรม", gen:"11" },
+  { id:"G11·S22", title:"ชายหนุ่มที่เลือกทำดีแม้ไม่มีใครเห็น",            cat:"ละครคุณธรรม", gen:"11" },
+  { id:"G11·S23", title:"พี่น้องที่คืนดีกันเพราะคำสอนของแม่",              cat:"ละครคุณธรรม", gen:"11" },
+  { id:"G11·S24", title:"เด็กกำพร้าผู้ตอบแทนบุญคุณ",                      cat:"ละครคุณธรรม", gen:"11" },
+  { id:"G11·S25", title:"ความดีเล็กๆ ที่กลับมาเป็นปาฏิหาริย์",            cat:"ละครคุณธรรม", gen:"11" },
+
+  // ═══════════════════════════════════════
+  // GENERATOR 12 — Moral Drama Set B / ละครคุณธรรม (ชุด B)
+  // ═══════════════════════════════════════
+  { id:"G12·S1",  title:"แม่เลี้ยงใจร้ายกับลูกเลี้ยงผู้ไม่เคยโกรธตอบ",   cat:"ละครคุณธรรม", gen:"12" },
+  { id:"G12·S2",  title:"คนเก็บของเก่าที่คืนทรัพย์สินมหาศาล",              cat:"ละครคุณธรรม", gen:"12" },
+  { id:"G12·S3",  title:"ลูกสาวที่ดูแลพ่อแม้ถูกทอดทิ้ง",                 cat:"ละครคุณธรรม", gen:"12" },
+  { id:"G12·S4",  title:"เศรษฐีผู้ดูถูกคนจนจนสูญเสียทุกอย่าง",             cat:"ละครคุณธรรม", gen:"12" },
+  { id:"G12·S5",  title:"พนักงานเสิร์ฟที่ช่วยชีวิตเจ้าของโรงแรม",          cat:"ละครคุณธรรม", gen:"12" },
+  { id:"G12·S6",  title:"หญิงสาวที่ยอมเสียโอกาสเพื่อช่วยเพื่อน",           cat:"ละครคุณธรรม", gen:"12" },
+  { id:"G12·S7",  title:"เด็กขายพวงมาลัยกับทุนการศึกษาที่ไม่คาดฝัน",       cat:"ละครคุณธรรม", gen:"12" },
+  { id:"G12·S8",  title:"สามีที่สำนึกผิดและขอเริ่มต้นใหม่",                cat:"ละครคุณธรรม", gen:"12" },
+  { id:"G12·S9",  title:"ลูกชายที่กลับมาขอขมาแม่",                         cat:"ละครคุณธรรม", gen:"12" },
+  { id:"G12·S10", title:"คนสวนผู้ซื่อสัตย์กับมรดกมหาศาล",                  cat:"ละครคุณธรรม", gen:"12" },
+  { id:"G12·S11", title:"พี่ชายที่ยอมลำบากเพื่อครอบครัว",                  cat:"ละครคุณธรรม", gen:"12" },
+  { id:"G12·S12", title:"ครูเกษียณที่ลูกศิษย์กลับมาตอบแทนบุญคุณ",          cat:"ละครคุณธรรม", gen:"12" },
+  { id:"G12·S13", title:"หญิงชรากับเงินก้อนสุดท้ายที่แบ่งปันให้ผู้อื่น",  cat:"ละครคุณธรรม", gen:"12" },
+  { id:"G12·S14", title:"เด็กฝึกงานที่ไม่ยอมโกงแม้ถูกกดดัน",               cat:"ละครคุณธรรม", gen:"12" },
+  { id:"G12·S15", title:"นักธุรกิจผู้ค้นพบว่าความดีมีค่ากว่ากำไร",          cat:"ละครคุณธรรม", gen:"12" },
+  { id:"G12·S16", title:"ภรรยาที่ให้อภัยสามีหลังรู้ความจริง",               cat:"ละครคุณธรรม", gen:"12" },
+  { id:"G12·S17", title:"เจ้าของร้านที่รับเลี้ยงเด็กกำพร้า",               cat:"ละครคุณธรรม", gen:"12" },
+  { id:"G12·S18", title:"พนักงานรักษาความปลอดภัยที่ช่วยบริษัทจากวิกฤต",    cat:"ละครคุณธรรม", gen:"12" },
+  { id:"G12·S19", title:"เพื่อนบ้านที่ดูแลกันในยามลำบาก",                  cat:"ละครคุณธรรม", gen:"12" },
+  { id:"G12·S20", title:"ลูกหนี้ที่คืนเงินครบทุกบาท",                      cat:"ละครคุณธรรม", gen:"12" },
+  { id:"G12·S21", title:"ชายหนุ่มที่เลือกพูดความจริงแม้ต้องเสียทุกอย่าง", cat:"ละครคุณธรรม", gen:"12" },
+  { id:"G12·S22", title:"แม่ค้าผู้ไม่เคยเอาเปรียบลูกค้า",                 cat:"ละครคุณธรรม", gen:"12" },
+  { id:"G12·S23", title:"พี่สะใภ้ที่ดูแลแม่สามีด้วยใจจริง",                cat:"ละครคุณธรรม", gen:"12" },
+  { id:"G12·S24", title:"เด็กยากจนที่ตอบแทนผู้มีพระคุณ",                   cat:"ละครคุณธรรม", gen:"12" },
+  { id:"G12·S25", title:"บุญคุณที่ส่งต่อจากรุ่นสู่รุ่น",                   cat:"ละครคุณธรรม", gen:"12" },
 ];
 
 // ── State ──
