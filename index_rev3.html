@@ -37,6 +37,8 @@
       --gen10: #DC2626;
       --gen11: #0EA5E9;
       --gen12: #14B8A6;
+      --gen13: #D946EF;
+      --gen14: #059669;
 
       /* Category colors */
       --cat-romance: #E8516A;
@@ -174,6 +176,8 @@
     .pill[data-gen="10"].active { background: var(--gen10); border-color: var(--gen10); }
     .pill[data-gen="11"].active { background: var(--gen11); border-color: var(--gen11); }
     .pill[data-gen="12"].active { background: var(--gen12); border-color: var(--gen12); }
+    .pill[data-gen="13"].active { background: var(--gen13); border-color: var(--gen13); }
+    .pill[data-gen="14"].active { background: var(--gen14); border-color: var(--gen14); }
 
     /* ── Main content ── */
     .main-section { padding: 36px 0 80px; }
@@ -216,6 +220,8 @@
     .card[data-gen="10"] { border-left-color: var(--gen10); }
     .card[data-gen="11"] { border-left-color: var(--gen11); }
     .card[data-gen="12"] { border-left-color: var(--gen12); }
+    .card[data-gen="13"] { border-left-color: var(--gen13); }
+    .card[data-gen="14"] { border-left-color: var(--gen14); }
 
     .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .series-id { font-size: 11px; font-weight: 700; color: var(--slate); letter-spacing: 0.4px; text-transform: uppercase; }
@@ -237,6 +243,8 @@
     .gen-tag[data-gen="10"] { background: var(--gen10); }
     .gen-tag[data-gen="11"] { background: var(--gen11); }
     .gen-tag[data-gen="12"] { background: var(--gen12); }
+    .gen-tag[data-gen="13"] { background: var(--gen13); }
+    .gen-tag[data-gen="14"] { background: var(--gen14); }
 
     .card-title {
       font-family: 'Anuphan', 'Inter', sans-serif;
@@ -304,36 +312,36 @@
   <div class="nav-inner">
     <a class="nav-logo" href="#">Thai Drama <em>Series Explorer</em></a>
     <div class="nav-right">
-      <span class="nav-pill" id="nav-total">300 Series</span>
-      <span class="nav-pill">12 Generators</span>
+      <span class="nav-pill" id="nav-total">350 Series</span>
+      <span class="nav-pill">14 Generators</span>
     </div>
   </div>
 </nav>
 
 <!-- ── Hero ── -->
 <section class="hero-dark">
-  <div class="hero-eyebrow">Series Mapping Dashboard — v3.2</div>
+  <div class="hero-eyebrow">Series Mapping Dashboard — v3.3</div>
   <h1 class="hero-heading">Thai Drama Series Explorer</h1>
-  <p class="hero-sub">คลังเนื้อเรื่อง Mini-Series 300 เรื่องจาก 12 Generator สำหรับ Content Creators</p>
+  <p class="hero-sub">คลังเนื้อเรื่อง Mini-Series 350 เรื่องจาก 14 Generator สำหรับ Content Creators</p>
 </section>
 
 <!-- ── Stats strip ── -->
 <div class="stats-blue">
   <div class="stats-inner">
     <div class="stat-item">
-      <div class="stat-number" id="stat-shown">300</div>
+      <div class="stat-number" id="stat-shown">350</div>
       <div class="stat-label">Series ที่แสดง</div>
     </div>
     <div class="stat-item">
-      <div class="stat-number">9</div>
+      <div class="stat-number">11</div>
       <div class="stat-label">Categories</div>
     </div>
     <div class="stat-item">
-      <div class="stat-number">12</div>
+      <div class="stat-number">14</div>
       <div class="stat-label">Source Generators</div>
     </div>
     <div class="stat-item">
-      <div class="stat-number">300</div>
+      <div class="stat-number">350</div>
       <div class="stat-label">Total Stories</div>
     </div>
   </div>
@@ -347,7 +355,7 @@
         <svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         <input class="search-input" type="text" id="search-input" placeholder="ค้นหาชื่อเรื่อง หรือ Series ID..." autocomplete="off" />
       </div>
-      <div class="result-count">แสดง <strong id="result-num">300</strong> จาก 300 เรื่อง</div>
+      <div class="result-count">แสดง <strong id="result-num">350</strong> จาก 350 เรื่อง</div>
     </div>
 
     <div class="filter-row">
@@ -363,6 +371,8 @@
         <button class="pill" data-cat="ย้อนยุค">ย้อนยุค</button>
         <button class="pill" data-cat="อาชญากรรม & ระทึกขวัญ">อาชญากรรม &amp; ระทึกขวัญ</button>
         <button class="pill" data-cat="ละครคุณธรรม">ละครคุณธรรม</button>
+        <button class="pill" data-cat="ต่างชาติในไทย">ต่างชาติในไทย</button>
+        <button class="pill" data-cat="ชีวิตใหม่ต่างแดน">ชีวิตใหม่ต่างแดน</button>
       </div>
     </div>
 
@@ -382,6 +392,8 @@
         <button class="pill" data-gen="10">Gen 10</button>
         <button class="pill" data-gen="11">Gen 11</button>
         <button class="pill" data-gen="12">Gen 12</button>
+        <button class="pill" data-gen="13">Gen 13</button>
+        <button class="pill" data-gen="14">Gen 14</button>
       </div>
     </div>
   </div>
@@ -405,6 +417,8 @@
       <div class="legend-item"><div class="legend-dot" style="background:var(--gen10)"></div> Gen 10 · อาชญากรรม &amp; ระทึกขวัญ</div>
       <div class="legend-item"><div class="legend-dot" style="background:var(--gen11)"></div> Gen 11 · ละครคุณธรรม (ชุด A)</div>
       <div class="legend-item"><div class="legend-dot" style="background:var(--gen12)"></div> Gen 12 · ละครคุณธรรม (ชุด B)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--gen13)"></div> Gen 13 · Foreign Gentleman in Thailand</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--gen14)"></div> Gen 14 · A New Life Abroad</div>
     </div>
 
     <div class="series-grid" id="series-container">
@@ -421,9 +435,9 @@
   <div class="footer-inner">
     <div>
       <div class="footer-brand">Thai Drama <em>Series Explorer</em></div>
-      <p class="footer-brand-desc">คลังเนื้อเรื่อง Mini-Series 300 เรื่อง ครอบคลุม 12 Generator สำหรับ Content Creators บน TikTok · YouTube Shorts · Facebook Reels</p>
+      <p class="footer-brand-desc">คลังเนื้อเรื่อง Mini-Series 350 เรื่อง ครอบคลุม 14 Generator สำหรับ Content Creators บน TikTok · YouTube Shorts · Facebook Reels</p>
     </div>
-    <div class="footer-copy">Series Mapping Dashboard v3.2 · 12 Generators · 300 Stories</div>
+    <div class="footer-copy">Series Mapping Dashboard v3.3 · 14 Generators · 350 Stories</div>
   </div>
 </footer>
 
@@ -776,6 +790,64 @@ const seriesData = [
   { id:"G12·S23", title:"พี่สะใภ้ที่ดูแลแม่สามีด้วยใจจริง",                cat:"ละครคุณธรรม", gen:"12" },
   { id:"G12·S24", title:"เด็กยากจนที่ตอบแทนผู้มีพระคุณ",                   cat:"ละครคุณธรรม", gen:"12" },
   { id:"G12·S25", title:"บุญคุณที่ส่งต่อจากรุ่นสู่รุ่น",                   cat:"ละครคุณธรรม", gen:"12" },
+
+  // ═══════════════════════════════════════
+  // GENERATOR 13 — Set A: Foreign Gentleman in Thailand
+  // ═══════════════════════════════════════
+  { id:"G13·S1",  title:"แม่ค้าก๋วยเตี๋ยวกับเศรษฐีอังกฤษที่นั่งกินร้านเดิมทุกวัน", cat:"ต่างชาติในไทย", gen:"13" },
+  { id:"G13·S2",  title:"พนักงานโรงแรมกับชายอเมริกันผู้สูญเสียภรรยา", cat:"ต่างชาติในไทย", gen:"13" },
+  { id:"G13·S3",  title:"แม่เลี้ยงเดี่ยวกับนักธุรกิจเยอรมันที่ย้ายมาเชียงใหม่", cat:"ต่างชาติในไทย", gen:"13" },
+  { id:"G13·S4",  title:"หญิงสาวที่ถูกดูถูกกับชาวสวิสผู้มองเห็นคุณค่าของเธอ", cat:"ต่างชาติในไทย", gen:"13" },
+  { id:"G13·S5",  title:"พนักงานร้านกาแฟกับวิศวกรชาวแคนาดาที่ใช้ชีวิตอย่างเรียบง่าย", cat:"ต่างชาติในไทย", gen:"13" },
+  { id:"G13·S6",  title:"สาวโรงงานกับนักเขียนชาวอังกฤษผู้หนีความเศร้า", cat:"ต่างชาติในไทย", gen:"13" },
+  { id:"G13·S7",  title:"พนักงานนวดกับชายฝรั่งเศสผู้ใจดีที่ไม่เคยตัดสินเธอ", cat:"ต่างชาติในไทย", gen:"13" },
+  { id:"G13·S8",  title:"แม่ค้าตลาดสดกับชาวออสเตรเลียผู้รักครอบครัว", cat:"ต่างชาติในไทย", gen:"13" },
+  { id:"G13·S9",  title:"ครูสอนพิเศษกับชายดัตช์ผู้ใช้ชีวิตเงียบ ๆ ริมทะเล", cat:"ต่างชาติในไทย", gen:"13" },
+  { id:"G13·S10", title:"สาวเสิร์ฟกับนักลงทุนชาวนอร์เวย์ผู้เริ่มต้นชีวิตใหม่", cat:"ต่างชาติในไทย", gen:"13" },
+  { id:"G13·S11", title:"หญิงสาวติดหนี้กับเศรษฐีอังกฤษที่ยื่นมือช่วยอย่างให้เกียรติ", cat:"ต่างชาติในไทย", gen:"13" },
+  { id:"G13·S12", title:"พนักงานคลินิกกับชาวสวีเดนผู้สูญเสียลูกสาว", cat:"ต่างชาติในไทย", gen:"13" },
+  { id:"G13·S13", title:"แม่ค้าดอกไม้กับนักเดินเรือชาวเดนมาร์กผู้โดดเดี่ยว", cat:"ต่างชาติในไทย", gen:"13" },
+  { id:"G13·S14", title:"พนักงานออฟฟิศกับชายอเมริกันวัย 60 ที่ยังเชื่อในรักแท้", cat:"ต่างชาติในไทย", gen:"13" },
+  { id:"G13·S15", title:"สาวต่างจังหวัดกับเศรษฐีชาวเบลเยียมผู้รักความเรียบง่าย", cat:"ต่างชาติในไทย", gen:"13" },
+  { id:"G13·S16", title:"พนักงานร้านหนังสือกับชาวไอริชผู้เขียนนิยายรักไม่ออก", cat:"ต่างชาติในไทย", gen:"13" },
+  { id:"G13·S17", title:"หญิงสาวที่ถูกแฟนนอกใจ กับชายอังกฤษผู้รักษาหัวใจเธอ", cat:"ต่างชาติในไทย", gen:"13" },
+  { id:"G13·S18", title:"แม่ค้าผลไม้กับชาวฟินแลนด์ผู้หนีชีวิตวุ่นวาย", cat:"ต่างชาติในไทย", gen:"13" },
+  { id:"G13·S19", title:"พนักงานคอนโดกับเศรษฐีอเมริกันผู้ซ่อนบาดแผลในใจ", cat:"ต่างชาติในไทย", gen:"13" },
+  { id:"G13·S20", title:"สาวขายเสื้อผ้ากับชายสวิสผู้สอนให้เธอรักตัวเอง", cat:"ต่างชาติในไทย", gen:"13" },
+  { id:"G13·S21", title:"หญิงสาวที่ต้องเลี้ยงน้อง กับนักธุรกิจฝรั่งเศสผู้เคารพเธอ", cat:"ต่างชาติในไทย", gen:"13" },
+  { id:"G13·S22", title:"พนักงานธนาคารกับชาวอังกฤษผู้ใช้ชีวิตหลังเกษียณในไทย", cat:"ต่างชาติในไทย", gen:"13" },
+  { id:"G13·S23", title:"สาวที่ถูกตราหน้าว่าเกาะฝรั่ง กับชายเยอรมันผู้ปกป้องเธอ", cat:"ต่างชาติในไทย", gen:"13" },
+  { id:"G13·S24", title:"หญิงสาวผู้ดูแลแม่ป่วย กับเศรษฐีชาวแคนาดาผู้เปลี่ยนชีวิตเธอ", cat:"ต่างชาติในไทย", gen:"13" },
+  { id:"G13·S25", title:"เมียเช่าที่กลายเป็นรักแท้กับสุภาพบุรุษชาวอังกฤษ", cat:"ต่างชาติในไทย", gen:"13" },
+
+  // ═══════════════════════════════════════
+  // GENERATOR 14 — Set B: A New Life Abroad
+  // ═══════════════════════════════════════
+  { id:"G14·S1",  title:"แม่เลี้ยงเดี่ยวกับชายอังกฤษที่พาเธอเริ่มต้นใหม่ที่ลอนดอน", cat:"ชีวิตใหม่ต่างแดน", gen:"14" },
+  { id:"G14·S2",  title:"สาวต่างจังหวัดกับเศรษฐีอเมริกันที่ชวนเธอไปนิวยอร์ก", cat:"ชีวิตใหม่ต่างแดน", gen:"14" },
+  { id:"G14·S3",  title:"หญิงสาวติดหนี้กับชาวแคนาดาผู้มอบบ้านใหม่ในแวนคูเวอร์", cat:"ชีวิตใหม่ต่างแดน", gen:"14" },
+  { id:"G14·S4",  title:"พนักงานร้านอาหารกับชายสวิสผู้พาเธอไปใช้ชีวิตในซูริก", cat:"ชีวิตใหม่ต่างแดน", gen:"14" },
+  { id:"G14·S5",  title:"สาวขายดอกไม้กับชาวฝรั่งเศสผู้พาเธอไปปารีส", cat:"ชีวิตใหม่ต่างแดน", gen:"14" },
+  { id:"G14·S6",  title:"หญิงสาวที่ถูกครอบครัวดูถูก กับชาวเยอรมันผู้มอบโอกาสครั้งใหม่", cat:"ชีวิตใหม่ต่างแดน", gen:"14" },
+  { id:"G14·S7",  title:"พนักงานคลินิกกับชายนอร์เวย์ผู้พาเธอไปชมแสงเหนือ", cat:"ชีวิตใหม่ต่างแดน", gen:"14" },
+  { id:"G14·S8",  title:"สาวโรงงานกับเศรษฐีอังกฤษที่มอบอนาคตให้เธอ", cat:"ชีวิตใหม่ต่างแดน", gen:"14" },
+  { id:"G14·S9",  title:"แม่ค้าตลาดกับชาวสวีเดนผู้สร้างบ้านให้เธอในสตอกโฮล์ม", cat:"ชีวิตใหม่ต่างแดน", gen:"14" },
+  { id:"G14·S10", title:"หญิงสาวผู้ดูแลแม่ป่วย กับชายอเมริกันที่ขอพาเธอไปเริ่มต้นใหม่", cat:"ชีวิตใหม่ต่างแดน", gen:"14" },
+  { id:"G14·S11", title:"พนักงานนวดกับชาวดัตช์ผู้พาเธอไปอยู่ริมคลองอัมสเตอร์ดัม", cat:"ชีวิตใหม่ต่างแดน", gen:"14" },
+  { id:"G14·S12", title:"สาวเสิร์ฟกับชาวฟินแลนด์ผู้สอนให้เธอเชื่อในตัวเอง", cat:"ชีวิตใหม่ต่างแดน", gen:"14" },
+  { id:"G14·S13", title:"หญิงสาวที่ถูกแฟนทิ้ง กับชายอังกฤษผู้เปิดประตูสู่โลกใหม่", cat:"ชีวิตใหม่ต่างแดน", gen:"14" },
+  { id:"G14·S14", title:"แม่เลี้ยงเดี่ยวกับเศรษฐีสวิสผู้รักลูกของเธอเหมือนลูกตัวเอง", cat:"ชีวิตใหม่ต่างแดน", gen:"14" },
+  { id:"G14·S15", title:"พนักงานร้านกาแฟกับชายออสเตรเลียผู้พาเธอไปซิดนีย์", cat:"ชีวิตใหม่ต่างแดน", gen:"14" },
+  { id:"G14·S16", title:"หญิงสาวที่ไม่มีเงินเรียน กับชาวแคนาดาผู้สนับสนุนความฝัน", cat:"ชีวิตใหม่ต่างแดน", gen:"14" },
+  { id:"G14·S17", title:"สาวขายของออนไลน์กับชายฝรั่งเศสผู้มอบชีวิตที่เธอไม่เคยฝันถึง", cat:"ชีวิตใหม่ต่างแดน", gen:"14" },
+  { id:"G14·S18", title:"พนักงานโรงแรมกับชาวเยอรมันผู้ให้เธอเป็นเจ้าของธุรกิจ", cat:"ชีวิตใหม่ต่างแดน", gen:"14" },
+  { id:"G14·S19", title:"หญิงสาวที่ถูกตราหน้าว่าเกาะฝรั่ง กับชายอังกฤษผู้แต่งงานกับเธออย่างให้เกียรติ", cat:"ชีวิตใหม่ต่างแดน", gen:"14" },
+  { id:"G14·S20", title:"สาวที่เสียทุกอย่าง กับชาวอเมริกันผู้มอบครอบครัวใหม่", cat:"ชีวิตใหม่ต่างแดน", gen:"14" },
+  { id:"G14·S21", title:"พนักงานบัญชีกับชายเดนมาร์กผู้พาเธอไปเริ่มต้นใหม่", cat:"ชีวิตใหม่ต่างแดน", gen:"14" },
+  { id:"G14·S22", title:"หญิงสาวที่ต้องเลี้ยงน้อง กับเศรษฐีเบลเยียมผู้ไม่เคยดูถูกเธอ", cat:"ชีวิตใหม่ต่างแดน", gen:"14" },
+  { id:"G14·S23", title:"แม่ค้าผลไม้กับชาวนอร์เวย์ผู้ขอให้เธอไปอยู่ด้วยกัน", cat:"ชีวิตใหม่ต่างแดน", gen:"14" },
+  { id:"G14·S24", title:"หญิงสาวผู้หมดหวัง กับชาวสวีเดนผู้พาเธอไปพบชีวิตที่ดีกว่า", cat:"ชีวิตใหม่ต่างแดน", gen:"14" },
+  { id:"G14·S25", title:"จากสาวธรรมดา สู่ภรรยาที่ได้รับความรักแท้ในต่างแดน", cat:"ชีวิตใหม่ต่างแดน", gen:"14" },
 ];
 
 // ── State ──
